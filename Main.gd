@@ -8,7 +8,6 @@ extends Node3D
 ## TODO: add configuration warning. must not be 0. negative values rotate reversed.
 @export var idle_spin_speed: int = 120
 
-# [X: (-0.939693, 0, 0.34202), Y: (0.17101, 0.866025, 0.469846), Z: (-0.296198, 0.5, -0.813797), O: (50, 50, -100)]
 ## Save initial camera view
 @onready var camera_home: Transform3D = $Camera.transform
 
