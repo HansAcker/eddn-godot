@@ -44,7 +44,7 @@ static func parse_starpos(from: Dictionary) -> Vector3:
 	if !(starpos is Array && len(starpos) == 3 &&
 			(starpos[0] is float) && (starpos[1] is float) && (starpos[2] is float)):
 		return POS_INVALID
-	return Vector3(starpos[0], starpos[1], starpos[2])
+	return Vector3(-starpos[0], starpos[1], starpos[2])  ## +x in ED is -x in this world
 
 static func parse(from: Dictionary) -> StarSystemRecord:
 	var star_system := StarSystemRecord.new()

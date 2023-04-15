@@ -47,9 +47,10 @@ default_font = SubResource("SystemFont_m3hyb")
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_wod4n")
+idle_spin = false
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(-0.939693, 0.17101, -0.296198, 0, 0.866025, 0.5, 0.34202, 0.469846, -0.813797, 50, 50, -100)
+transform = Transform3D(-0.939693, 0.17101, -0.296198, 0, 0.866025, 0.5, 0.34202, 0.469846, -0.813798, -50, 50, -100)
 far = 100000.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -58,16 +59,15 @@ environment = SubResource("Environment_xftdg")
 [node name="Map" type="Node3D" parent="."]
 
 [node name="Galaxy" type="MeshInstance3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -21, 25900)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, -21, 25900)
 mesh = SubResource("PlaneMesh_bnbkk")
+
+[node name="Center" parent="Map/Galaxy" instance=ExtResource("5_b0o3s")]
+pixel_size = 0.2
+texture = ExtResource("2_btkb5")
 
 [node name="Sol" parent="Map" instance=ExtResource("5_b0o3s")]
 modulate = Color(1, 0.827451, 0.541176, 1)
-
-[node name="SagA" parent="Map" instance=ExtResource("5_b0o3s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -21, 25900)
-pixel_size = 0.2
-texture = ExtResource("2_btkb5")
 
 [node name="StarManager" type="Node" parent="Map"]
 script = ExtResource("5_w6kjq")
