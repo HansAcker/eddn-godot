@@ -1,0 +1,137 @@
+[gd_scene load_steps=18 format=3 uid="uid://c4rjg7p7fmipt"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
+[ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
+[ext_resource type="Texture2D" uid="uid://mnrjfu41axvo" path="res://Stars/textures/flare_white.png" id="2_btkb5"]
+[ext_resource type="Script" path="res://ws/EDDNReceiver.gd" id="2_g4fw5"]
+[ext_resource type="Texture2D" uid="uid://tu51wfur5kq7" path="res://Stars/textures/galaxy.jpg" id="3_fd031"]
+[ext_resource type="PackedScene" uid="uid://c7ssby8abrgs6" path="res://Stars/StarClass_Generic.tscn" id="5_b0o3s"]
+[ext_resource type="Script" path="res://Stars/StarManager.gd" id="5_w6kjq"]
+[ext_resource type="Script" path="res://ws/JSONWebSocketReceiver.gd" id="6_127la"]
+[ext_resource type="Script" path="res://UI/FPS.gd" id="8_l17iv"]
+[ext_resource type="Script" path="res://UI/UI_EDDNEvent.gd" id="8_x8crc"]
+[ext_resource type="Script" path="res://UI/StarCount.gd" id="8_xvtex"]
+[ext_resource type="Script" path="res://ws/GenericEvent.gd" id="14_4qmla"]
+
+[sub_resource type="Environment" id="Environment_xftdg"]
+background_mode = 1
+glow_enabled = true
+glow_intensity = 2.0
+glow_bloom = 1.0
+glow_blend_mode = 0
+fog_light_color = Color(0.392157, 0.392157, 0.392157, 1)
+fog_density = 0.0025
+fog_sky_affect = 0.0
+volumetric_fog_sky_affect = 0.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nkkv3"]
+transparency = 1
+blend_mode = 1
+cull_mode = 2
+depth_draw_mode = 2
+shading_mode = 0
+disable_ambient_light = true
+albedo_color = Color(1, 1, 1, 0.0196078)
+albedo_texture = ExtResource("3_fd031")
+disable_receive_shadows = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bnbkk"]
+material = SubResource("StandardMaterial3D_nkkv3")
+size = Vector2(104000, 104000)
+
+[sub_resource type="SystemFont" id="SystemFont_m3hyb"]
+font_names = PackedStringArray("Lucida Console", "Monospace")
+
+[sub_resource type="Theme" id="Theme_y7a2b"]
+default_font = SubResource("SystemFont_m3hyb")
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_wod4n")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(-0.939693, 0.17101, -0.296198, 0, 0.866025, 0.5, 0.34202, 0.469846, -0.813797, 50, 50, -100)
+far = 100000.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xftdg")
+
+[node name="Map" type="Node3D" parent="."]
+
+[node name="Galaxy" type="MeshInstance3D" parent="Map"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -21, 25900)
+mesh = SubResource("PlaneMesh_bnbkk")
+
+[node name="Sol" parent="Map" instance=ExtResource("5_b0o3s")]
+modulate = Color(1, 0.827451, 0.541176, 1)
+
+[node name="SagA" parent="Map" instance=ExtResource("5_b0o3s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, -21, 25900)
+pixel_size = 0.2
+texture = ExtResource("2_btkb5")
+
+[node name="StarManager" type="Node" parent="Map"]
+script = ExtResource("5_w6kjq")
+
+[node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
+wait_time = 23.0
+autostart = true
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="UI_EDDNEvent" type="VBoxContainer" parent="UI"]
+offset_right = 1.0
+offset_bottom = 54.0
+theme = SubResource("Theme_y7a2b")
+script = ExtResource("8_x8crc")
+
+[node name="Type" type="Label" parent="UI/UI_EDDNEvent"]
+layout_mode = 2
+
+[node name="SystemName" type="Label" parent="UI/UI_EDDNEvent"]
+layout_mode = 2
+
+[node name="Position" type="Label" parent="UI/UI_EDDNEvent"]
+layout_mode = 2
+
+[node name="FPS" type="Label" parent="UI"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("8_l17iv")
+
+[node name="StarCount" type="Label" parent="UI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+script = ExtResource("8_xvtex")
+
+[node name="Receiver" type="Node" parent="."]
+
+[node name="JSONWebSocketReceiver" type="Node" parent="Receiver"]
+script = ExtResource("6_127la")
+
+[node name="EDDNReceiver" type="Node" parent="Receiver"]
+script = ExtResource("2_g4fw5")
+
+[node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
+script = ExtResource("2_3lfp6")
+
+[node name="GenericEvent" type="Node" parent="Receiver/EDDNReceiver"]
+script = ExtResource("14_4qmla")
+
+[connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
+[connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
+[connection signal="disconnected" from="Receiver/JSONWebSocketReceiver" to="UI/UI_EDDNEvent" method="_on_json_web_socket_receiver_disconnected"]
+[connection signal="received" from="Receiver/JSONWebSocketReceiver" to="Receiver/EDDNReceiver" method="_on_json_web_socket_receiver_received"]
+[connection signal="received" from="Receiver/EDDNReceiver" to="UI/UI_EDDNEvent" method="_on_eddn_receiver_received"]
+[connection signal="received" from="Receiver/EDDNReceiver" to="Receiver/EDDNReceiver/NavRoute" method="_on_eddn_receiver_received"]
+[connection signal="received" from="Receiver/EDDNReceiver" to="Receiver/EDDNReceiver/GenericEvent" method="_on_eddn_receiver_received"]
