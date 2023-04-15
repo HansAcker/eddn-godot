@@ -23,5 +23,5 @@ func _on_eddn_receiver_received(event_type: StringName, message: Dictionary, _st
 		## TODO: check for POS_INVALID?
 		## TODO: draw lines
 		## TODO: configurable alpha scale
-		star_manager.add(wp, expire * 1000, clampi(age, 0, 3600) / 4000.0)
+		star_manager.add(wp, expire * 1000,  1.0 - (clampi(age, 0, 3600) / 4000.0) if age > 10 else 1.0)
 		cur = wp

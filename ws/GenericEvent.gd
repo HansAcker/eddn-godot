@@ -18,4 +18,4 @@ func _on_eddn_receiver_received(event_type: StringName, _message: Dictionary, st
 			print("Empty name for %s in %d %s" % [event_type, star_system.id, star_system.position])
 
 		## TODO: configurable alpha scale
-		star_manager.add(star_system, expire * 1000, clampi(age, 0, 3600) / 4000.0)
+		star_manager.add(star_system, expire * 1000, 1.0 - (clampi(age, 0, 3600) / 4000.0) if age > 10 else 1.0)
