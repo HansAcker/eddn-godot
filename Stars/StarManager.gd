@@ -14,9 +14,10 @@ class StarEntry:
 	var system: StarSystemRecord  ## system name, class and location
 	var star: SpriteBase3D  ## the star node
 	var expire_tick: int  ## msec tick after which the star should be deleted
-	var tween: Tween
-	var alpha: float
-	var pixel_size: float
+	var tween_ref: WeakRef  ## not to keep finished Tweens around
+	var alpha: float  ## additional alpha applied to color
+	var color: Color  ## original color, for tweening
+	var pixel_size: float  ## original size, for tweening
 
 var _stars := {}
 
@@ -32,20 +33,24 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 	if (star_system.id in _stars):
 		var star_entry := _stars[id] as StarEntry
-		var system_entry := star_entry.system as StarSystemRecord
-
-		## TODO: also update .system?
-		## TODO: update alpha
-
-		var tween := star_entry.tween
+		var system_entry := star_entry.system
 		var star := star_entry.star
 
-		if !tween.is_running():
+		## TODO: also update .system?
+
+		var _tween = star_entry.tween_ref.get_ref()
+		if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
 			## highlight activity
-			tween = create_tween()
+			var tween := create_tween()
+			tween.set_parallel()
 			tween.tween_property(star, "pixel_size", star_entry.pixel_size * 10.0, 0.1)
+			## update alpha if larger
+			if (alpha > star_entry.alpha):
+				star_entry.alpha = alpha
+				tween.tween_property(star, "modulate", star_entry.color * alpha, 0.2)
+			tween.chain()
 			tween.tween_property(star, "pixel_size", star_entry.pixel_size, 0.2).set_trans(Tween.TRANS_EXPO)
-			star_entry.tween = tween
+			star_entry.tween_ref = weakref(tween)
 
 		## update timeout
 		## TODO: could expire() delete the entry while in here?
@@ -67,6 +72,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 			## TODO: better code-path
 			return
 
+	## set sprite from star class or default
 	var Star := StarClasses.sprites[&"default"]
 	if star_system.star_class in StarClasses.sprites:
 		Star = StarClasses.sprites[star_system.star_class]
@@ -74,6 +80,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	var star := Star.instantiate() as SpriteBase3D
 	star.transform.origin = star_system.position
 
+	## set color from star class or default
 	var color := StarClasses.colors[&"default"]
 	if star_system.star_class in StarClasses.colors:
 		color = StarClasses.colors[star_system.star_class]
@@ -92,7 +99,8 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	star_entry.system = star_system
 	star_entry.star = star
 	star_entry.expire_tick = expire_tick
-	star_entry.tween = tween
+	star_entry.tween_ref = weakref(tween)
+	star_entry.color = color
 	star_entry.alpha = alpha
 	star_entry.pixel_size = star.pixel_size
 
@@ -106,7 +114,9 @@ func delete_id(id: int) -> void:
 	if id in _stars:
 		if _stars[id] is StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
 			var star_entry := _stars[id] as StarEntry
-			star_entry.tween.kill()  ## stop animation
+			var _tween = star_entry.tween_ref.get_ref()
+			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
+				_tween.kill()  ## stop animation
 			star_entry.star.queue_free()  ## remove star from scene
 		_stars.erase(id)
 #		counter.emit(len(_stars))
@@ -127,7 +137,7 @@ func expire() -> int:
 		var star_entry := _stars[star_key] as StarEntry
 		if star_entry.expire_tick > 0 && now > star_entry.expire_tick:
 #			print("Expired Key: ", star_key, " Entry: ", star_entry)
-			count = count+1
+			count += 1
 			delete_id(star_key)
 
 	counter.emit(len(_stars))
