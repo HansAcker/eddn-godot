@@ -84,6 +84,9 @@ offset_bottom = 54.0
 theme = SubResource("Theme_y7a2b")
 script = ExtResource("8_x8crc")
 
+[node name="Timestamp" type="Label" parent="UI/UI_EDDNEvent"]
+layout_mode = 2
+
 [node name="Type" type="Label" parent="UI/UI_EDDNEvent"]
 layout_mode = 2
 
