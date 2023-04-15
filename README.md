@@ -10,4 +10,6 @@ For now, it just idly spins the camera with no control on an unfinished
 galaxy, uses huge amounts of memory since the last iteration and randomly
 stops receiving websocket events.
 
+Coding styles and spelling still WIP.
+
 Sprites and galaxy plane from the [Canonn Map](https://map.canonn.tech/).
