@@ -12,20 +12,22 @@ signal counter(count: int)
 
 class StarEntry:
 	var system: StarSystemRecord  ## system name, class and location
-	var star: Node  ## the star node
+	var star: SpriteBase3D  ## the star node
 	var expire_tick: int  ## msec tick after which the star should be deleted
+	var tween: Tween
+	var alpha: float
+	var pixel_size: float
 
 var _stars := {}
 
 
-## TODO: alpha parameter?
-func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
+func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0) -> void:
 	## get_ticks_msec() wraps after roughly 500 million years. don't run that long.
 	var expire_tick : int = Time.get_ticks_msec() + expire_msec if expire_msec > 0 else 0
 	var id := star_system.id
 
-	if id == -1:
-		print("StarManager refusing to add system -1: ", star_system)
+	if id == -1 || star_system.position == StarSystemRecord.POS_INVALID:
+		print("StarManager refusing to add invalid system: ", star_system)
 		return
 
 	if (star_system.id in _stars):
@@ -33,8 +35,17 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 		var system_entry := star_entry.system as StarSystemRecord
 
 		## TODO: also update .system?
+		## TODO: update alpha
 
-		## TODO: highlight-tween
+		var tween := star_entry.tween
+		var star := star_entry.star
+
+		if !tween.is_running():
+			## highlight activity
+			tween = create_tween()
+			tween.tween_property(star, "pixel_size", star_entry.pixel_size * 10.0, 0.1)
+			tween.tween_property(star, "pixel_size", star_entry.pixel_size, 0.2).set_trans(Tween.TRANS_EXPO)
+			star_entry.tween = tween
 
 		## update timeout
 		## TODO: could expire() delete the entry while in here?
@@ -68,7 +79,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 		color = StarClasses.colors[star_system.star_class]
 	elif star_system.star_class != &"":
 		print("not in colors: %s" % star_system.star_class)
-	star.modulate = color
+	star.modulate = color * alpha
 
 	var tween = create_tween()
 	## TODO: make effect configurable
@@ -81,6 +92,9 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 	star_entry.system = star_system
 	star_entry.star = star
 	star_entry.expire_tick = expire_tick
+	star_entry.tween = tween
+	star_entry.alpha = alpha
+	star_entry.pixel_size = star.pixel_size
 
 	_stars[star_system.id] = star_entry;
 
@@ -91,7 +105,9 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 func delete_id(id: int) -> void:
 	if id in _stars:
 		if _stars[id] is StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
-			(_stars[id] as StarEntry).star.queue_free()  ## remove star from scene
+			var star_entry := _stars[id] as StarEntry
+			star_entry.tween.kill()  ## stop animation
+			star_entry.star.queue_free()  ## remove star from scene
 		_stars.erase(id)
 #		counter.emit(len(_stars))
 
