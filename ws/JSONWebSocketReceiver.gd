@@ -29,6 +29,11 @@ var _socket := WebSocketPeer.new()
 var _connected : bool = false
 
 
+## TODO: debug aid
+func reconnect() -> void:
+	_socket = WebSocketPeer.new()
+	_ws_connect()
+
 func _retry() -> void:
 	get_tree().create_timer(retry_delay, true, true, true).timeout.connect(_ws_connect)
 
