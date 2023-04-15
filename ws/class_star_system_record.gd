@@ -1,5 +1,4 @@
 class_name StarSystemRecord
-extends Object
 
 
 ## Basic star system information

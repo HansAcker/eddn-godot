@@ -1,5 +1,4 @@
 class_name StarClasses
-extends Object
 
 
 ## Colors and sprites for different star classes
