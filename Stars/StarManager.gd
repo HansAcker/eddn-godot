@@ -4,10 +4,16 @@ extends Node
 
 ## adds and removes star sprites
 ## TODO: PointMeshes?
+## TODO: event nodes use get_node("../../....") to get here. use something else.
+
 
 ## TODO: UI quick hack. Think again.
 signal counter(count: int)
 
+class StarEntry:
+	var system: StarSystemRecord  ## system name, class and location
+	var star: Node  ## the star node
+	var expire_tick: int  ## msec tick after which the star should be deleted
 
 var _stars := {}
 
@@ -23,12 +29,15 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 		return
 
 	if (star_system.id in _stars):
-		var star_entry := _stars[id] as Dictionary
+		var star_entry := _stars[id] as StarEntry
 		var system_entry := star_entry.system as StarSystemRecord
 
 		## TODO: also update .system?
 
+		## TODO: highlight-tween
+
 		## update timeout
+		## TODO: could expire() delete the entry while in here?
 		if expire_tick > star_entry.expire_tick:
 			star_entry.expire_tick = expire_tick
 
@@ -37,9 +46,10 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 			print("Found name for %d: %s" % [system_entry.id, system_entry.name])
 
 		## TODO: "Scan" events in multi-star systems change classes. Select main star.
+		## TODO: use .is_empty() on StringName or == &""?
 		#if star_system.star_class != &"" && star_system.star_class != system_entry.star_class:
-		if system_entry.star_class == &"" && star_system.star_class != &"":
-			print("Star class changed: %s %s -> %s" % [star_system.name, system_entry.star_class, star_system.star_class])
+		if system_entry.star_class.is_empty() && !star_system.star_class.is_empty():
+#			print("Star class changed: %s %s -> %s" % [star_system.name, system_entry.star_class, star_system.star_class])
 			## TODO: could just change color. but maybe also use different sprites.
 			delete_id(id)
 		else:
@@ -60,12 +70,17 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 		print("not in colors: %s" % star_system.star_class)
 	star.modulate = color
 
-	## TODO: define record type
-	var star_entry := {
-		"system": star_system,
-		"star": star,
-		"expire_tick": expire_tick
-	}
+	var tween = create_tween()
+	## TODO: make effect configurable
+	## TODO: maybe scale by distance to camera
+	## TODO: could it glow more with color values > 1.0?
+	tween.tween_property(star, "pixel_size", star.pixel_size * 20.0, 0.1)
+	tween.tween_property(star, "pixel_size", star.pixel_size, 0.2)
+
+	var star_entry := StarEntry.new()
+	star_entry.system = star_system
+	star_entry.star = star
+	star_entry.expire_tick = expire_tick
 
 	_stars[star_system.id] = star_entry;
 
@@ -75,20 +90,25 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0) -> void:
 
 func delete_id(id: int) -> void:
 	if id in _stars:
-		if _stars[id] is Dictionary:
-			var star_entry := _stars[id] as Dictionary
-			if is_instance_of(star_entry.get("star"), Node):
-				(star_entry.star as Node).queue_free()
+		if _stars[id] is StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
+			(_stars[id] as StarEntry).star.queue_free()  ## remove star from scene
 		_stars.erase(id)
 #		counter.emit(len(_stars))
+
+
+func clear() -> void:
+	for star_key in _stars.keys():
+		delete_id(star_key)
+	counter.emit(len(_stars))
 
 
 func expire() -> int:
 	var now := Time.get_ticks_msec()
 	var count : int = 0
 
+	## TODO: something more efficient than iterating over thousands of objects
 	for star_key in _stars.keys():
-		var star_entry := _stars[star_key] as Dictionary
+		var star_entry := _stars[star_key] as StarEntry
 		if star_entry.expire_tick > 0 && now > star_entry.expire_tick:
 #			print("Expired Key: ", star_key, " Entry: ", star_entry)
 			count = count+1
