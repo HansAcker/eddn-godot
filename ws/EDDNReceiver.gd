@@ -10,7 +10,13 @@ extends Node
 
 
 ## Maximum accepted difference in seconds between local time and event timestamp.
-@export var cut_off : int = 3600
+## Set to -1 to disable
+@export var cut_off : int = -1:
+	set(value):
+		if value < 0:
+			value = -1
+		cut_off = value
+		update_configuration_warnings()
 
 
 ## Emitted when an EDDN event was received.
@@ -38,10 +44,9 @@ func _on_json_web_socket_receiver_received(data: Dictionary) -> void:
 		return
 
 	var age := (Time.get_unix_time_from_system() as int) - ts;
-	if age > cut_off:
-		pass
+	if cut_off >= 0 && age > cut_off:
 		## ignore old data
-		#return
+		return
 
 	var _event_type = message.get("event")
 	if _event_type is String && _event_type != "":
