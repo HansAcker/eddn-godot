@@ -35,7 +35,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 	## Scale highlight effects with distance to camera
 	## TODO: review scale, maybe exp?
-	var dist_scale := max(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / 2000.0) as float
+	var dist_scale := max(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / 1000.0) as float
 #	print(dist_scale)
 
 	if (star_system.id in _stars):
