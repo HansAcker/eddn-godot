@@ -32,7 +32,7 @@ cull_mode = 2
 depth_draw_mode = 2
 shading_mode = 0
 disable_ambient_light = true
-albedo_color = Color(1, 1, 1, 0.00784314)
+albedo_color = Color(1, 1, 1, 0.0117647)
 albedo_texture = ExtResource("3_fd031")
 disable_receive_shadows = true
 
@@ -51,7 +51,7 @@ script = ExtResource("1_wod4n")
 idle_spin = false
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(-0.939693, 0.17101, -0.296198, 0, 0.866025, 0.5, 0.34202, 0.469846, -0.813798, -50, 50, -100)
+transform = Transform3D(-0.939693, -0.196175, 0.280167, 0, 0.819152, 0.573577, -0.34202, 0.538985, -0.769751, 4000, 4000, -4000)
 far = 100000.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -138,9 +138,11 @@ script = ExtResource("2_g4fw5")
 
 [node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("2_3lfp6")
+expire = 3600
 
 [node name="GenericEvent" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("14_4qmla")
+expire = 3600
 
 [connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
 [connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
