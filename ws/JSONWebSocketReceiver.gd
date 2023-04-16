@@ -82,6 +82,7 @@ func _process(_delta: float) -> void:
 			pass
 		WebSocketPeer.STATE_OPEN:
 			if !_connected:
+				print("WebSocket connected.")
 				_connected = true
 				connected.emit()
 			pass

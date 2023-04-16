@@ -76,10 +76,11 @@ func _physics_process(delta: float) -> void:
 #	var camera_transform := $Camera.transform as Transform3D
 #	var camera_changed := false
 
-	## TODO: handle shift
-	## TODO: use input strength
+	## TODO: handle shift for faster movement with keys
 	## TODO: use Node3D.translate()/rotate() or transform?
 	## TODO: reconcile normalizing vectors with input strength
+	## TODO: implement "zoom": scale movement speed with zoom factor
+	## TODO: use mouse wheel for zoom
 
 	## Movement along global axes
 	if Input.is_action_pressed(&"move_forward"):
