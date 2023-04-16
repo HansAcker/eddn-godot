@@ -12,13 +12,13 @@ extends Node3D
 @export var idle_spin_speed: int = 120
 
 ## Camera movement speed in ly/s
-@export var camera_movement_speed : float = 100.0
+@export var camera_movement_speed : float = 400.0
 
 ## Camera movement speed factor when shift key pressed.
 #@export var camera_movement_shift: float = 3.0
 
 ## Camera rotation speed in deg/s
-@export var camera_rotation_speed : float = 36.0 * 2.0
+@export var camera_rotation_speed : float = 36.0 * 3.0
 
 
 ## Save initial camera view
@@ -79,69 +79,74 @@ func _physics_process(delta: float) -> void:
 	## TODO: handle shift
 	## TODO: use input strength
 	## TODO: use Node3D.translate()/rotate() or transform?
+	## TODO: reconcile normalizing vectors with input strength
 
 	## Movement along global axes
 	if Input.is_action_pressed(&"move_forward"):
-		camera_vector += Vector3.FORWARD
+		camera_vector += Vector3.FORWARD * Input.get_action_strength(&"move_forward")
 
 	if Input.is_action_pressed(&"move_back"):
-		camera_vector += Vector3.BACK
+		camera_vector += Vector3.BACK * Input.get_action_strength(&"move_back")
 
 	if Input.is_action_pressed(&"move_left"):
-		camera_vector += Vector3.LEFT
+		camera_vector += Vector3.LEFT * Input.get_action_strength(&"move_left")
 
 	if Input.is_action_pressed(&"move_right"):
-		camera_vector += Vector3.RIGHT
+		camera_vector += Vector3.RIGHT * Input.get_action_strength(&"move_right")
 
 	if Input.is_action_pressed(&"move_up"):
-		camera_vector += Vector3.UP
+		camera_vector += Vector3.UP * Input.get_action_strength(&"move_up")
 
 	if Input.is_action_pressed(&"move_down"):
-		camera_vector += Vector3.DOWN
+		camera_vector += Vector3.DOWN * Input.get_action_strength(&"move_down")
 
 	if camera_vector.length():
 		## adjust to camera rotation
 		camera_vector = camera_vector.rotated(Vector3.UP, $Camera.rotation.y)
 		#$Camera.translate(camera_vector * camera_movement_speed * delta)
-		$Camera.transform = $Camera.transform.translated(camera_vector.normalized() * camera_movement_speed * delta)
+		$Camera.transform = $Camera.transform.translated(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
 
 	## Movement along local axes
 	if Input.is_action_pressed(&"zoom_in"):
-		camera_vector += Vector3.FORWARD
+		camera_vector += Vector3.FORWARD * Input.get_action_strength(&"zoom_in")
 
 	if Input.is_action_pressed(&"zoom_out"):
-		camera_vector += Vector3.BACK
+		camera_vector += Vector3.BACK * Input.get_action_strength(&"zoom_out")
 
 	if camera_vector.length():
 		#$Camera.translate_object_local(camera_vector * camera_movement_speed * delta)
-		$Camera.transform = $Camera.transform.translated_local(camera_vector.normalized() * camera_movement_speed * delta)
+		$Camera.transform = $Camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
 
 	## Left/right rotates around global y axis
 	if Input.is_action_pressed(&"look_left"):
-		camera_vector += Vector3.UP
+		$Camera.rotate(Vector3.UP, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_left") * delta))
+#		camera_vector += Vector3.UP
 
 	if Input.is_action_pressed(&"look_right"):
-		camera_vector += Vector3.DOWN
+		$Camera.rotate(Vector3.DOWN, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_right") * delta))
+#		camera_vector += Vector3.DOWN
 
-	if camera_vector.length():
-		$Camera.rotate(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
-		camera_vector = Vector3.ZERO
+#	if camera_vector.length():
+#		$Camera.rotate(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
+#		camera_vector = Vector3.ZERO
 
 
 	## Up/down rotates around local x axis
 	if Input.is_action_pressed(&"look_up"):
-		camera_vector += Vector3.LEFT
+		$Camera.rotate_object_local(Vector3.LEFT, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_up") * delta))
+#		camera_vector += Vector3.LEFT
 
 	if Input.is_action_pressed(&"look_down"):
-		camera_vector += Vector3.RIGHT
+		$Camera.rotate_object_local(Vector3.RIGHT, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_down") * delta))
+#		camera_vector += Vector3.RIGHT
 
-	if camera_vector.length():
-		$Camera.rotate_object_local(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
-		camera_vector = Vector3.ZERO
+#	if camera_vector.length():
+#		$Camera.rotate_object_local(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
+#		camera_vector = Vector3.ZERO
 
 #	if camera_changed:
 #		$Camera.transform = camera_transform
