@@ -10,7 +10,8 @@ extends Node
 ## TODO: UI quick hack. Think again.
 signal counter(count: int)
 
-class StarEntry:
+
+class _StarEntry:
 	var system: StarSystemRecord  ## system name, class and location
 	var star: SpriteBase3D  ## the star node
 	var expire_tick: int  ## msec tick after which the star should be deleted
@@ -31,8 +32,13 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		print("StarManager refusing to add invalid system: ", star_system)
 		return
 
+	## Scale highlight effects with distance to camera
+	## TODO: review scale, maybe exp?
+	var dist_scale := max(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / 2000.0) as float
+#	print(dist_scale)
+
 	if (star_system.id in _stars):
-		var star_entry := _stars[id] as StarEntry
+		var star_entry := _stars[id] as _StarEntry
 		var system_entry := star_entry.system
 		var star := star_entry.star
 
@@ -43,7 +49,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 			## highlight activity
 			var tween := create_tween()
 			tween.set_parallel()
-			tween.tween_property(star, "pixel_size", star_entry.pixel_size * 10.0, 0.1)
+			tween.tween_property(star, "pixel_size", star_entry.pixel_size * 10.0 * dist_scale, 0.1)
 			## update alpha if larger
 			if (alpha > star_entry.alpha):
 				star_entry.alpha = alpha
@@ -90,12 +96,11 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 	var tween = create_tween()
 	## TODO: make effect configurable
-	## TODO: maybe scale by distance to camera
 	## TODO: could it glow more with color values > 1.0?
-	tween.tween_property(star, "pixel_size", star.pixel_size * 20.0, 0.1)
+	tween.tween_property(star, "pixel_size", star.pixel_size * 20.0 * dist_scale, 0.1)
 	tween.tween_property(star, "pixel_size", star.pixel_size, 0.2)
 
-	var star_entry := StarEntry.new()
+	var star_entry := _StarEntry.new()
 	star_entry.system = star_system
 	star_entry.star = star
 	star_entry.expire_tick = expire_tick
@@ -112,8 +117,8 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 func delete_id(id: int) -> void:
 	if id in _stars:
-		if _stars[id] is StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
-			var star_entry := _stars[id] as StarEntry
+		if _stars[id] is _StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
+			var star_entry := _stars[id] as _StarEntry
 			var _tween = star_entry.tween_ref.get_ref()
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
 				_tween.kill()  ## stop animation
@@ -134,7 +139,7 @@ func expire() -> int:
 
 	## TODO: something more efficient than iterating over thousands of objects
 	for star_key in _stars.keys():
-		var star_entry := _stars[star_key] as StarEntry
+		var star_entry := _stars[star_key] as _StarEntry
 		if star_entry.expire_tick > 0 && now > star_entry.expire_tick:
 #			print("Expired Key: ", star_key, " Entry: ", star_entry)
 			count += 1
@@ -146,4 +151,4 @@ func expire() -> int:
 func _on_expire_timer_timeout():
 	var ts := Time.get_ticks_usec()
 	var count := expire()
-	print("StarManager.expire() took %dµs, removed %d nodes" % [(Time.get_ticks_usec() - ts), count])
+#	print("StarManager.expire() took %dµs, removed %d nodes" % [(Time.get_ticks_usec() - ts), count])
