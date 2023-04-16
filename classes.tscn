@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://ckpxgustlhuwc"]
 
 [ext_resource type="Script" path="res://Stars/class_star_classes.gd" id="1_pbeyx"]
-[ext_resource type="Script" path="res://ws/class_star_system_record.gd" id="2_afeek"]
+[ext_resource type="Script" path="res://ws/class_star_system_record.gd" id="2_2sgcy"]
 
 [node name="_classes" type="Node"]
 
@@ -9,4 +9,4 @@
 script = ExtResource("1_pbeyx")
 
 [node name="StarSystemRecord" type="Node" parent="."]
-script = ExtResource("2_afeek")
+script = ExtResource("2_2sgcy")
