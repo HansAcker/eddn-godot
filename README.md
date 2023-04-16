@@ -8,12 +8,12 @@ plots [EDDN](https://github.com/EDCD/EDDN) events in the galaxy.
 
 Coding styles and spelling still WIP.
 
+The server connection sometimes stops receiving events.
+Press Backspace to reconnect.
+
 Sprites and galaxy plane from the [Canonn Map](https://map.canonn.tech/)
 ([Github](https://github.com/canonn-science/CanonnED3D-Map)).
 Websocket server code [here](https://github.com/HansAcker/EDDN-RealTime/tree/master/eddnws).
-
-The server connection sometimes stops receiving events.
-Press Backspace to reconnect the websocket.
 
 Camera movement with joystick axes or WASD/RF/QE/YC.
 Home to get home. Del to remove all stars.
