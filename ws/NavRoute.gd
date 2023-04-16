@@ -21,15 +21,13 @@ func _on_eddn_receiver_received(event_type: StringName, message: Dictionary, _st
 	## TODO: configurable alpha scale
 	var alpha := 1.0 - (clampi(age, 0, 3600) / 4000.0) if age > 10 else 1.0
 
-	var cur := StarSystemRecord.parse(route.pop_front())
-#	var line : Array[Vector3] = [cur.position]
+#	var line : Array[Vector3] = [StarSystemRecord.parse(route[0]).position]
 
 	for _wp in route:
 		var wp := StarSystemRecord.parse(_wp)
 #		line.push_back(wp.position)
 		## TODO: check for POS_INVALID?
 		star_manager.add(wp, expire * 1000,  alpha)
-		cur = wp
 
 	## TODO: draw lines
 #	print("Line: ", line)
