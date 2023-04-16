@@ -79,6 +79,7 @@ func _physics_process(delta: float) -> void:
 	## TODO: use input strength
 	## TODO: use Node3D.translate()/rotate() or transform?
 
+	## Movement along global axes
 	if Input.is_action_pressed(&"move_forward"):
 		camera_vector += Vector3.FORWARD
 
@@ -97,12 +98,24 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed(&"move_down"):
 		camera_vector += Vector3.DOWN
 
-	## Movement along global axes
 	if camera_vector.length() > 0.0:
 		## adjust to camera rotation
 		camera_vector = camera_vector.rotated(Vector3.UP, $Camera.rotation.y)
-		#$Camera.translate_object_local(camera_vector * camera_movement_speed * delta)
+		#$Camera.translate(camera_vector * camera_movement_speed * delta)
 		$Camera.transform = $Camera.transform.translated(camera_vector * camera_movement_speed * delta)
+		camera_vector = Vector3.ZERO
+
+
+	## Movement along local axes
+	if Input.is_action_pressed(&"zoom_in"):
+		camera_vector += Vector3.FORWARD
+
+	if Input.is_action_pressed(&"zoom_out"):
+		camera_vector += Vector3.BACK
+
+	if camera_vector.length() > 0.0:
+		#$Camera.translate_object_local(camera_vector * camera_movement_speed * delta)
+		$Camera.transform = $Camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
 
