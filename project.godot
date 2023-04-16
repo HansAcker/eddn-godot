@@ -67,30 +67,6 @@ move_up={
 , Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":10,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
-pitch_up={
-"deadzone": 0.5,
-"events": []
-}
-pitch_down={
-"deadzone": 0.5,
-"events": []
-}
-turn_left={
-"deadzone": 0.5,
-"events": []
-}
-turn_right={
-"deadzone": 0.5,
-"events": []
-}
-roll_ccw={
-"deadzone": 0.5,
-"events": []
-}
-roll_cw={
-"deadzone": 0.5,
-"events": []
-}
 zoom_in={
 "deadzone": 0.5,
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":4,"pressed":false,"double_click":false,"script":null)
