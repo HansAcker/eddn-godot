@@ -6,10 +6,10 @@ My first [Godot](https://godotengine.org/) experiment.
 Connects to a [websocket server](https://eddn-realtime.space/) and
 plots [EDDN](https://github.com/EDCD/EDDN) events in the galaxy.
 
-For now, it just idly spins the camera with no control on an unfinished
-galaxy, uses huge amounts of memory since the last iteration and randomly
-stops receiving websocket events.
-
 Coding styles and spelling still WIP.
 
 Sprites and galaxy plane from the [Canonn Map](https://map.canonn.tech/).
+
+Camera movement with joystick axes or WASD/RF/QE/YC.
+Home to get home. Del to remove all stars.
+Backspace to reconnect the websocket.
