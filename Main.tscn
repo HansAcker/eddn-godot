@@ -75,7 +75,7 @@ modulate = Color(1, 0.827451, 0.541176, 1)
 script = ExtResource("5_w6kjq")
 
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
-wait_time = 23.0
+wait_time = 123.0
 autostart = true
 
 [node name="UI" type="CanvasLayer" parent="."]
