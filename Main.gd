@@ -99,7 +99,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed(&"move_down"):
 		camera_vector += Vector3.DOWN
 
-	if camera_vector.length() > 0.0:
+	if camera_vector.length():
 		## adjust to camera rotation
 		camera_vector = camera_vector.rotated(Vector3.UP, $Camera.rotation.y)
 		#$Camera.translate(camera_vector * camera_movement_speed * delta)
@@ -114,7 +114,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed(&"zoom_out"):
 		camera_vector += Vector3.BACK
 
-	if camera_vector.length() > 0.0:
+	if camera_vector.length():
 		#$Camera.translate_object_local(camera_vector * camera_movement_speed * delta)
 		$Camera.transform = $Camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
@@ -127,7 +127,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed(&"look_right"):
 		camera_vector += Vector3.DOWN
 
-	if camera_vector.length() > 0.0:
+	if camera_vector.length():
 		$Camera.rotate(camera_vector, deg_to_rad(camera_rotation_speed * delta))
 		camera_vector = Vector3.ZERO
 
@@ -139,7 +139,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_pressed(&"look_down"):
 		camera_vector += Vector3.RIGHT
 
-	if camera_vector.length() > 0.0:
+	if camera_vector.length():
 		$Camera.rotate_object_local(camera_vector, deg_to_rad(camera_rotation_speed * delta))
 		camera_vector = Vector3.ZERO
 
