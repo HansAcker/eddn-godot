@@ -101,7 +101,7 @@ func _physics_process(delta: float) -> void:
 
 	if camera_vector.length():
 		## adjust to camera rotation
-		camera_vector = camera_vector.rotated(Vector3.UP, $Camera.rotation.y)
+		camera_vector = camera_vector.normalized().rotated(Vector3.UP, $Camera.rotation.y)
 		#$Camera.translate(camera_vector * camera_movement_speed * delta)
 		$Camera.transform = $Camera.transform.translated(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
@@ -116,7 +116,7 @@ func _physics_process(delta: float) -> void:
 
 	if camera_vector.length():
 		#$Camera.translate_object_local(camera_vector * camera_movement_speed * delta)
-		$Camera.transform = $Camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
+		$Camera.transform = $Camera.transform.translated_local(camera_vector.normalized() * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
 
@@ -128,7 +128,7 @@ func _physics_process(delta: float) -> void:
 		camera_vector += Vector3.DOWN
 
 	if camera_vector.length():
-		$Camera.rotate(camera_vector, deg_to_rad(camera_rotation_speed * delta))
+		$Camera.rotate(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
 		camera_vector = Vector3.ZERO
 
 
@@ -140,7 +140,7 @@ func _physics_process(delta: float) -> void:
 		camera_vector += Vector3.RIGHT
 
 	if camera_vector.length():
-		$Camera.rotate_object_local(camera_vector, deg_to_rad(camera_rotation_speed * delta))
+		$Camera.rotate_object_local(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
 		camera_vector = Vector3.ZERO
 
 #	if camera_changed:
