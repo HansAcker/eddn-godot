@@ -101,9 +101,9 @@ func _physics_process(delta: float) -> void:
 
 	if camera_vector.length():
 		## adjust to camera rotation
-		camera_vector = camera_vector.normalized().rotated(Vector3.UP, $Camera.rotation.y)
+		camera_vector = camera_vector.rotated(Vector3.UP, $Camera.rotation.y)
 		#$Camera.translate(camera_vector * camera_movement_speed * delta)
-		$Camera.transform = $Camera.transform.translated(camera_vector * camera_movement_speed * delta)
+		$Camera.transform = $Camera.transform.translated(camera_vector.normalized() * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
 
