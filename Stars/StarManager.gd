@@ -91,7 +91,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	var color := StarClasses.colors[&"default"]
 	if star_system.star_class in StarClasses.colors:
 		color = StarClasses.colors[star_system.star_class]
-	elif star_system.star_class != &"":
+	elif !star_system.star_class.is_empty():
 		print("not in colors: %s" % star_system.star_class)
 	star.modulate = color * alpha
 
