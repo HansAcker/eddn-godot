@@ -43,7 +43,7 @@ func _on_json_web_socket_receiver_received(data: Dictionary) -> void:
 		print("EDDN message contains invalid timestamp")
 		return
 
-	var age := (Time.get_unix_time_from_system() as int) - ts;
+	var age := (ceilf(Time.get_unix_time_from_system()) as int) - ts;
 	if cut_off >= 0 && age > cut_off:
 		## ignore old data
 		return
