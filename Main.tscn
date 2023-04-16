@@ -60,7 +60,7 @@ environment = SubResource("Environment_xftdg")
 [node name="Map" type="Node3D" parent="."]
 
 [node name="Galaxy" type="MeshInstance3D" parent="Map"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25, -21, 25900)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -25, -21, 25900)
 mesh = SubResource("PlaneMesh_bnbkk")
 
 [node name="Center" parent="Map/Galaxy" instance=ExtResource("5_b0o3s")]
