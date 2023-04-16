@@ -65,6 +65,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		handled = true
 	elif event.is_action_pressed(&"reconnect"):
 		$Receiver/JSONWebSocketReceiver.reconnect()
+		handled = true
 
 	if handled:
 		get_viewport().set_input_as_handled()
