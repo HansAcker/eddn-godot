@@ -3,7 +3,8 @@ extends Node
 
 
 ## adds and removes star sprites
-## TODO: PointMeshes?
+## TODO: freeze stars into something more easier on the engine. ArrayMesh?
+##       keep individually animated sprites only while the effect runs.
 ## TODO: event nodes use get_node("../../....") to get here. use something else.
 
 
@@ -127,6 +128,7 @@ func delete_id(id: int) -> void:
 #		counter.emit(len(_stars))
 
 
+## TODO: use co-routine, don't block the loop
 func clear() -> void:
 	for star_key in _stars.keys():
 		delete_id(star_key)
