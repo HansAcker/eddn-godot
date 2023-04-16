@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://c4rjg7p7fmipt"]
+[gd_scene load_steps=19 format=3 uid="uid://c4rjg7p7fmipt"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
 [ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://UI/FPS.gd" id="8_l17iv"]
 [ext_resource type="Script" path="res://UI/UI_EDDNEvent.gd" id="8_x8crc"]
 [ext_resource type="Script" path="res://UI/StarCount.gd" id="8_xvtex"]
+[ext_resource type="Script" path="res://UI/CameraPosition.gd" id="10_jjyrp"]
 [ext_resource type="Script" path="res://ws/GenericEvent.gd" id="14_4qmla"]
 
 [sub_resource type="Environment" id="Environment_xftdg"]
@@ -31,7 +32,7 @@ cull_mode = 2
 depth_draw_mode = 2
 shading_mode = 0
 disable_ambient_light = true
-albedo_color = Color(1, 1, 1, 0.0196078)
+albedo_color = Color(1, 1, 1, 0.00784314)
 albedo_texture = ExtResource("3_fd031")
 disable_receive_shadows = true
 
@@ -67,6 +68,7 @@ pixel_size = 0.2
 texture = ExtResource("2_btkb5")
 
 [node name="Sol" parent="Map" instance=ExtResource("5_b0o3s")]
+visible = false
 modulate = Color(1, 0.827451, 0.541176, 1)
 
 [node name="StarManager" type="Node" parent="Map"]
@@ -116,6 +118,15 @@ offset_top = -23.0
 offset_right = 40.0
 grow_vertical = 0
 script = ExtResource("8_xvtex")
+
+[node name="CameraPosition" type="Label" parent="UI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 23.0
+grow_horizontal = 0
+script = ExtResource("10_jjyrp")
 
 [node name="Receiver" type="Node" parent="."]
 
