@@ -150,7 +150,7 @@ func expire() -> int:
 	counter.emit(len(_stars))
 	return count
 
-func _on_expire_timer_timeout():
+func _on_expire_timer_timeout() -> void:
 	var ts := Time.get_ticks_usec()
 	var count := expire()
 #	print("StarManager.expire() took %dµs, removed %d nodes" % [(Time.get_ticks_usec() - ts), count])
