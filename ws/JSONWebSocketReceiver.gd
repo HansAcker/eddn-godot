@@ -32,9 +32,12 @@ var _connected : bool = false
 ## TODO: debug aid
 func reconnect() -> void:
 	_socket = WebSocketPeer.new()
+	_connected = false
 	_ws_connect()
 
+
 func _retry() -> void:
+	## TODO: only a single timer should run
 	get_tree().create_timer(retry_delay, true, true, true).timeout.connect(_ws_connect)
 
 
