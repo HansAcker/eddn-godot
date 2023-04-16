@@ -30,7 +30,11 @@ var _connected : bool = false
 
 
 ## TODO: debug aid
+var last_message
+var receive_timer := Timer.new()
 func reconnect() -> void:
+	receive_timer.stop()
+	print("reconnect. last message was: ", last_message)
 	_socket = WebSocketPeer.new()
 	_connected = false
 	_ws_connect()
@@ -55,6 +59,10 @@ func _ws_connect() -> void:
 
 
 func _ready() -> void:
+	receive_timer.one_shot = true
+	receive_timer.wait_time = 12.3
+	receive_timer.timeout.connect(reconnect)
+	add_child(receive_timer)
 	_ws_connect()
 
 
@@ -71,9 +79,13 @@ func _process(_delta: float) -> void:
 		## TODO: int64 values parsed as float. precision loss?
 		var data = JSON.parse_string(packet.get_string_from_utf8())
 		if data is Dictionary:
+			receive_timer.stop()
 			received.emit(data)
+			receive_timer.start()
 		else:
 			print("WebSocket received invalid data")
+
+		last_message = data
 
 	match _socket.get_ready_state():
 		WebSocketPeer.STATE_CONNECTING:
