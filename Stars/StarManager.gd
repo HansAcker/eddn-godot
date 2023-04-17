@@ -8,6 +8,22 @@ extends Node
 ## TODO: event nodes use get_node("../../....") to get here. use something else.
 
 
+## Increase star size by this factor on activity.
+@export var flare_size: float = 10.0
+
+## Increase star size by this factor on first activity.
+@export var flare_size_new : float = 20.0
+
+## Increase star size by with distance to camera.
+@export var distance_factor : float = 1000.0
+
+## Time to flare size in seconds.
+@export var flare_up: float = 0.1
+
+## Time to normal size in seconds.
+@export var flare_down: float = 0.2
+
+
 ## TODO: UI quick hack. Think again.
 signal counter(count: int)
 
@@ -34,9 +50,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		return
 
 	## Scale highlight effects with distance to camera
-	## TODO: review scale, maybe exp?
-	var dist_scale := max(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / 1000.0) as float
-#	print(dist_scale)
+	var dist_scale := maxf(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / distance_factor)
 
 	if (star_system.id in _stars):
 		var star_entry := _stars[id] as _StarEntry
@@ -48,15 +62,14 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		var _tween = star_entry.tween_ref.get_ref()
 		if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
 			## highlight activity
-			var tween := create_tween()
-			tween.set_parallel()
-			tween.tween_property(star, "pixel_size", star_entry.pixel_size * 10.0 * dist_scale, 0.1)
+			var tween := create_tween().set_parallel()
+			tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
 			## update alpha if larger
 			if (alpha > star_entry.alpha):
 				star_entry.alpha = alpha
-				tween.tween_property(star, "modulate", star_entry.color * alpha, 0.2)
+				tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up)
 			tween.chain()
-			tween.tween_property(star, "pixel_size", star_entry.pixel_size, 0.2).set_trans(Tween.TRANS_EXPO)
+			tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
 			star_entry.tween_ref = weakref(tween)
 
 		## update timeout
@@ -98,8 +111,8 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	var tween = create_tween()
 	## TODO: make effect configurable
 	## TODO: could it glow more with color values > 1.0?
-	tween.tween_property(star, "pixel_size", star.pixel_size * 20.0 * dist_scale, 0.1)
-	tween.tween_property(star, "pixel_size", star.pixel_size, 0.2)
+	tween.tween_property(star, "pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
+	tween.tween_property(star, "pixel_size", star.pixel_size, flare_down)
 
 	var star_entry := _StarEntry.new()
 	star_entry.system = star_system
