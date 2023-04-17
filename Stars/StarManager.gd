@@ -145,10 +145,14 @@ func delete_id(id: int) -> void:
 #		counter.emit(len(_stars))
 
 
-## TODO: use co-routine, don't block the loop
 func clear() -> void:
+	var count : int = 0
 	for star_key in _stars.keys():
 		delete_id(star_key)
+		count += 1
+		if count >= 1000:
+			await get_tree().physics_frame  ## TODO: or process_frame? when does queue_free() free the node?
+			count = 0
 	counter.emit(len(_stars))
 
 
