@@ -42,10 +42,11 @@ func reconnect() -> void:
 
 func _retry() -> void:
 	## TODO: only a single timer should run
-	get_tree().create_timer(retry_delay, true, true, true).timeout.connect(_ws_connect)
+	get_tree().create_timer(retry_delay + (randf() * 2.3), true, true, true).timeout.connect(_ws_connect)
 
 
 func _ws_connect() -> void:
+	receive_timer.wait_time = 12.3 + (randf() * 23.5)
 	set_process(true)
 
 	var rc := _socket.connect_to_url(ws_url)
@@ -60,7 +61,6 @@ func _ws_connect() -> void:
 
 func _ready() -> void:
 	receive_timer.one_shot = true
-	receive_timer.wait_time = 12.3
 	receive_timer.timeout.connect(reconnect)
 	add_child(receive_timer)
 	_ws_connect()
