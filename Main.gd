@@ -40,8 +40,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			print("fullscreen on")
 #			DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, true)
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
-#			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+#			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		handled = true
 
 	if handled:
