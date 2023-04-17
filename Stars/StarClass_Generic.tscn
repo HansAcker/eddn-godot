@@ -1,9 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://c7ssby8abrgs6"]
+[gd_scene load_steps=3 format=3 uid="uid://c7ssby8abrgs6"]
 
 [ext_resource type="Texture2D" uid="uid://oh2d8hnygfen" path="res://Stars/textures/star_grey.png" id="1_dcejw"]
+[ext_resource type="FontFile" uid="uid://cwsiiot87fxby" path="res://Stars/fonts/Orbitron Light.ttf" id="2_ok4mw"]
 
 [node name="StarClass_Generic" type="Sprite3D"]
 billboard = 1
 alpha_cut = 2
 texture_filter = 1
 texture = ExtResource("1_dcejw")
+
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+visibility_range_begin = 20.0
+visibility_range_begin_margin = 20.0
+visibility_range_end = 100.0
+visibility_range_end_margin = 20.0
+visibility_range_fade_mode = 1
+offset = Vector2(0, -250)
+billboard = 1
+font = ExtResource("2_ok4mw")
+font_size = 120
+vertical_alignment = 0
+uppercase = true

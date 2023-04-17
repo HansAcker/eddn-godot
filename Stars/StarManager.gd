@@ -14,10 +14,10 @@ extends Node
 ## Increase star size by this factor on first activity.
 @export var flare_size_new : float = 20.0
 
-## Increase star size by with distance to camera.
+## Increase star size with distance to camera.
 @export var distance_factor : float = 1000.0
 
-## Time to flare size in seconds.
+## Time to full flare size in seconds.
 @export var flare_up: float = 0.1
 
 ## Time to normal size in seconds.
@@ -99,6 +99,10 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 	var star := Star.instantiate() as SpriteBase3D
 	star.transform.origin = star_system.position
+
+	var _label := star.get_node_or_null("Label")
+	if _label is Label3D:
+		(_label as Label3D).text = star_system.name
 
 	## set color from star class or default
 	var color := StarClasses.colors[&"default"]
