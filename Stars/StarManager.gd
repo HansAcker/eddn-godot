@@ -31,6 +31,7 @@ signal counter(count: int)
 class _StarEntry:
 	var system: StarSystemRecord  ## system name, class and location
 	var star: SpriteBase3D  ## the star node
+	var label: Label3D  ## the star's label
 	var expire_tick: int  ## msec tick after which the star should be deleted
 	var tween_ref: WeakRef  ## not to keep finished Tweens around
 	var alpha: float  ## additional alpha applied to color
@@ -40,7 +41,7 @@ class _StarEntry:
 var _stars := {}
 
 
-func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0) -> void:
+func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0, highlight: bool = true) -> void:
 	## get_ticks_msec() wraps after roughly 500 million years. don't run that long.
 	var expire_tick : int = Time.get_ticks_msec() + expire_msec if expire_msec > 0 else 0
 	var id := star_system.id
@@ -61,16 +62,18 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 		var _tween = star_entry.tween_ref.get_ref()
 		if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
-			## highlight activity
-			var tween := create_tween().set_parallel()
-			tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
 			## update alpha if larger
 			if (alpha > star_entry.alpha):
 				star_entry.alpha = alpha
-				tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up)
-			tween.chain()
-			tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
-			star_entry.tween_ref = weakref(tween)
+			## highlight activity
+			if highlight:
+				var tween := create_tween().set_parallel()
+				tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
+				tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here
+				tween.chain()
+				tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
+				tween.tween_property(star, "modulate", star_entry.color * star_entry.alpha, flare_up)  ## return to saved alpha
+				star_entry.tween_ref = weakref(tween)
 
 		## update timeout
 		## TODO: could expire() delete the entry while in here?
@@ -80,6 +83,10 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		if system_entry.name.is_empty() && !star_system.name.is_empty():
 			system_entry.name = star_system.name
 			print("Found name for %d: %s" % [system_entry.id, system_entry.name])
+
+		var _label := star_entry.label
+		if _label is Label3D:
+			(_label as Label3D).text = "%s" % [system_entry.name]
 
 		## TODO: "Scan" events in multi-star systems change classes. Select main star.
 		## TODO: use .is_empty() on StringName or == &""?
@@ -100,10 +107,6 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	var star := Star.instantiate() as SpriteBase3D
 	star.transform.origin = star_system.position
 
-	var _label := star.get_node_or_null("Label")
-	if _label is Label3D:
-		(_label as Label3D).text = star_system.name
-
 	## set color from star class or default
 	var color := StarClasses.colors[&"default"]
 	if star_system.star_class in StarClasses.colors:
@@ -112,20 +115,27 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		print("not in colors: %s" % star_system.star_class)
 	star.modulate = color * alpha
 
-	var tween = create_tween()
-	## TODO: make effect configurable
-	## TODO: could it glow more with color values > 1.0?
-	tween.tween_property(star, "pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
-	tween.tween_property(star, "pixel_size", star.pixel_size, flare_down)
-
 	var star_entry := _StarEntry.new()
 	star_entry.system = star_system
 	star_entry.star = star
 	star_entry.expire_tick = expire_tick
-	star_entry.tween_ref = weakref(tween)
 	star_entry.color = color
 	star_entry.alpha = alpha
 	star_entry.pixel_size = star.pixel_size
+
+	if highlight:
+		var tween = create_tween()
+		## TODO: could it glow more with color values > 1.0?
+		tween.tween_property(star, "pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
+		tween.tween_property(star, "pixel_size", star.pixel_size, flare_down)
+		star_entry.tween_ref = weakref(tween)
+	else:
+		star_entry.tween_ref = weakref(null)
+
+	var _label := star.get_node_or_null("Label")
+	if _label is Label3D:
+		star_entry.label = _label
+		(_label as Label3D).text = "%s" % [star_system.name, star_system]
 
 	_stars[star_system.id] = star_entry;
 

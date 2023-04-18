@@ -81,6 +81,12 @@ func _unhandled_input(event: InputEvent) -> void:
 #			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		handled = true
+	elif event.is_action_pressed(&"pause"):
+		idle_spin = !idle_spin
+		handled = true
+	elif event.is_action_pressed(&"edsm_fetch"):
+		$Map/EDSMQuery.add_stars_at($Camera.position)
+		handled = true
 
 	if handled:
 		get_viewport().set_input_as_handled()
@@ -93,9 +99,6 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed(&"ui_home"):
 		_move_camera(camera_home, 1.0 if !event.shift_pressed else 0.0)
-		handled = true
-	elif event.is_action_pressed(&"pause"):
-		idle_spin = !idle_spin
 		handled = true
 	elif event.is_action_pressed(&"clear"):
 		$Map/StarManager.clear()

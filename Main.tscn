@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://c4rjg7p7fmipt"]
+[gd_scene load_steps=20 format=3 uid="uid://c4rjg7p7fmipt"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
 [ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://c7ssby8abrgs6" path="res://Stars/StarClass_Generic.tscn" id="5_b0o3s"]
 [ext_resource type="Script" path="res://Stars/StarManager.gd" id="5_w6kjq"]
 [ext_resource type="Script" path="res://ws/JSONWebSocketReceiver.gd" id="6_127la"]
+[ext_resource type="Script" path="res://Stars/EDSMQuery.gd" id="8_esshd"]
 [ext_resource type="Script" path="res://UI/FPS.gd" id="8_l17iv"]
 [ext_resource type="Script" path="res://UI/UI_EDDNEvent.gd" id="8_x8crc"]
 [ext_resource type="Script" path="res://UI/StarCount.gd" id="8_xvtex"]
@@ -77,6 +78,9 @@ script = ExtResource("5_w6kjq")
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
 wait_time = 123.0
 autostart = true
+
+[node name="EDSMQuery" type="Node" parent="Map"]
+script = ExtResource("8_esshd")
 
 [node name="UI" type="CanvasLayer" parent="."]
 
