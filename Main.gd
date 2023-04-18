@@ -21,8 +21,26 @@ extends Node3D
 @export var camera_rotation_speed : float = 36.0 * 3.0
 
 
+## Camera presets
+## TODO: extract into class or @export?
+const camera_presets := {
+	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
+	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
+}
 ## Save initial camera view
 @onready var camera_home: Transform3D = ($Camera as Node3D).transform
+
+
+var _camera_tween_ref: WeakRef = weakref(null)
+func _move_camera(where: Transform3D, when: float) -> void:
+		var camera := $Camera as Node3D
+		if is_zero_approx(when):
+			camera.transform = where
+		else:
+			var _tween = _camera_tween_ref.get_ref()
+			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
+				_tween.kill()
+			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -52,10 +70,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var handled := false
 
 	if event.is_action_pressed(&"ui_home"):
-		if event.shift_pressed:
-			$Camera.transform = camera_home
-		else:
-			create_tween().tween_property($Camera, "transform", camera_home, 1.0)
+		_move_camera(camera_home, 1.0 if !event.shift_pressed else 0.0)
 		handled = true
 	elif event.is_action_pressed(&"pause"):
 		idle_spin = !idle_spin
@@ -65,6 +80,18 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		handled = true
 	elif event.is_action_pressed(&"reconnect"):
 		$Receiver/JSONWebSocketReceiver.reconnect()
+		handled = true
+	elif event.is_action_pressed(&"print_transform"):
+		var camera_transform := $Camera.transform as Transform3D
+		var camera_basis := camera_transform.basis
+		var camera_origin := camera_transform.origin
+		print("Transform3D(Vector3%s, Vector3%s, Vector3%s, Vector3%s)," % [camera_basis.x, camera_basis.y, camera_basis.z, camera_origin])
+		handled = true
+	elif event.is_action_pressed(&"preset_0"):
+		_move_camera(camera_presets[&"RobigoRun"], 1.0 if !event.shift_pressed else 0.0)
+		handled = true
+	elif event.is_action_pressed(&"preset_1"):
+		_move_camera(camera_presets[&"Colonia"], 1.0 if !event.shift_pressed else 0.0)
 		handled = true
 
 	if handled:
