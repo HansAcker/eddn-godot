@@ -26,7 +26,16 @@ extends Node3D
 const camera_presets := {
 	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
 	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
+	&"Shinra" : Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
 }
+
+const camera_preset_keys := [
+	&"RobigoRun",
+	&"Colonia",
+	&"Shinra",
+]
+
+
 ## Save initial camera view
 @onready var camera_home: Transform3D = ($Camera as Node3D).transform
 
@@ -69,6 +78,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	var handled := false
 
+	## TODO: match something instead of ifs?
+
 	if event.is_action_pressed(&"ui_home"):
 		_move_camera(camera_home, 1.0 if !event.shift_pressed else 0.0)
 		handled = true
@@ -88,11 +99,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		print("Transform3D(Vector3%s, Vector3%s, Vector3%s, Vector3%s)," % [camera_basis.x, camera_basis.y, camera_basis.z, camera_origin])
 		handled = true
 	elif event.is_action_pressed(&"preset_0"):
-		_move_camera(camera_presets[&"RobigoRun"], 1.0 if !event.shift_pressed else 0.0)
+		_move_camera(camera_presets[camera_preset_keys[0]], 1.0 if !event.shift_pressed else 0.0)
 		handled = true
 	elif event.is_action_pressed(&"preset_1"):
-		_move_camera(camera_presets[&"Colonia"], 1.0 if !event.shift_pressed else 0.0)
+		_move_camera(camera_presets[camera_preset_keys[1]], 1.0 if !event.shift_pressed else 0.0)
 		handled = true
+	elif event.is_action_pressed(&"preset_2"):
+		_move_camera(camera_presets[camera_preset_keys[2]], 1.0 if !event.shift_pressed else 0.0)
+		handled = true
+#	elif event.is_action_pressed(&"preset_3"):
+#		_move_camera(camera_presets[camera_preset_keys[3]], 1.0 if !event.shift_pressed else 0.0)
+#		handled = true
 
 	if handled:
 		get_viewport().set_input_as_handled()
