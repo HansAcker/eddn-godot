@@ -49,7 +49,7 @@ func _move_camera(where: Transform3D, when: float) -> void:
 			var _tween = _camera_tween_ref.get_ref()
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
 				(_tween as Tween).kill()
-			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when))
+			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT))
 
 func _handle_preset(index: int, tween: bool = true, store: bool = false) -> void:
 	if store:
