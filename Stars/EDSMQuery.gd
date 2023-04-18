@@ -37,9 +37,10 @@ func _ready() -> void:
 	http_request.request_completed.connect(self._http_request_completed)
 
 func add_stars_at(position: Vector3) -> void:
+	var center := Vector3(snappedf(-position.x, query_radius / 2.0), snappedf(position.y, query_radius / 2.0), snappedf(position.z, query_radius / 2.0))
+	print("EDSM query center: %s" % center)
 	var error = http_request.request(edsm_api_base + "/api-v1/sphere-systems?x=%s&y=%s&z=%s&radius=%d&minRadius=%d&showId=1&showCoordinates=1&showPrimaryStar=1" %
-			[("%.5f" % snappedf(-position.x, query_radius / 2.0)).uri_encode(), ("%.5f" % snappedf(position.y, query_radius / 2.0)).uri_encode(), ("%.5f" % snappedf(position.z, query_radius / 2.0)).uri_encode(),
-			query_radius, min_radius])
+			["%.5f" % center.x, "%.5f" % center.y, "%.5f" % center.z, query_radius, min_radius])
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
 
