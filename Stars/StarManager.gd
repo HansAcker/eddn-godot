@@ -135,7 +135,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	var _label := star.get_node_or_null("Label")
 	if _label is Label3D:
 		star_entry.label = _label
-		(_label as Label3D).text = "%s" % [star_system.name, star_system]
+		(_label as Label3D).text = "%s" % [star_system.name]
 
 	_stars[star_system.id] = star_entry;
 
