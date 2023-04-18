@@ -81,6 +81,7 @@ autostart = true
 
 [node name="EDSMQuery" type="Node" parent="Map"]
 script = ExtResource("8_esshd")
+expire = 1800
 
 [node name="UI" type="CanvasLayer" parent="."]
 
