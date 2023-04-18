@@ -22,18 +22,17 @@ extends Node3D
 
 
 ## Camera presets
-## TODO: extract into class or @export?
-const camera_presets := {
+const camera_presets_default := {
 	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
 	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
 	&"Shinra" : Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
 }
 
-const camera_preset_keys := [
-	&"RobigoRun",
-	&"Colonia",
-	&"Shinra",
-]
+## Pre-defined camera views.
+@export var camera_presets : Array[Transform3D] = [camera_presets_default[&"RobigoRun"], camera_presets_default[&"Colonia"], camera_presets_default[&"Shinra"]]
+
+## Seconds to reach preset view.
+@export var camera_preset_speed: float = 1.0
 
 
 ## Save initial camera view
@@ -50,6 +49,17 @@ func _move_camera(where: Transform3D, when: float) -> void:
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
 				_tween.kill()
 			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when))
+
+func _handle_preset(index: int, tween: bool = true, store: bool = false) -> void:
+	if store:
+		if len(camera_presets) <= index:
+			camera_presets.resize(index+1)
+		camera_presets[index] = $Camera.transform
+		print("stored camera preset %d: %s" % [index, camera_presets[index]])
+	elif len(camera_presets) > index && camera_presets[index] != Transform3D.IDENTITY:
+		_move_camera(camera_presets[index], camera_preset_speed if tween else 0.0)
+	else:
+		print("no camera preset at index %d" % index)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -99,17 +109,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		print("Transform3D(Vector3%s, Vector3%s, Vector3%s, Vector3%s)," % [camera_basis.x, camera_basis.y, camera_basis.z, camera_origin])
 		handled = true
 	elif event.is_action_pressed(&"preset_0"):
-		_move_camera(camera_presets[camera_preset_keys[0]], 1.0 if !event.shift_pressed else 0.0)
+		_handle_preset(0, !event.shift_pressed, event.ctrl_pressed)
 		handled = true
 	elif event.is_action_pressed(&"preset_1"):
-		_move_camera(camera_presets[camera_preset_keys[1]], 1.0 if !event.shift_pressed else 0.0)
+		_handle_preset(1, !event.shift_pressed, event.ctrl_pressed)
 		handled = true
 	elif event.is_action_pressed(&"preset_2"):
-		_move_camera(camera_presets[camera_preset_keys[2]], 1.0 if !event.shift_pressed else 0.0)
+		_handle_preset(2, !event.shift_pressed, event.ctrl_pressed)
 		handled = true
-#	elif event.is_action_pressed(&"preset_3"):
-#		_move_camera(camera_presets[camera_preset_keys[3]], 1.0 if !event.shift_pressed else 0.0)
-#		handled = true
+	elif event.is_action_pressed(&"preset_3"):
+		_handle_preset(3, !event.shift_pressed, event.ctrl_pressed)
+		handled = true
 
 	if handled:
 		get_viewport().set_input_as_handled()
