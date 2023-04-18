@@ -2,6 +2,15 @@ extends Node3D
 
 
 ## TODO: explain why which input is handled where
+## TODO: move camera movement/presets into its own script
+
+
+## Camera presets
+const camera_presets_default := {
+	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
+	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
+	&"Shinra" : Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
+}
 
 
 ## Idly spin around the y axis. Press "pause" input to stop/start.
@@ -19,14 +28,6 @@ extends Node3D
 
 ## Camera rotation speed in deg/s
 @export var camera_rotation_speed : float = 36.0 * 3.0
-
-
-## Camera presets
-const camera_presets_default := {
-	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
-	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
-	&"Shinra" : Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
-}
 
 ## Pre-defined camera views.
 @export var camera_presets : Array[Transform3D] = [camera_presets_default[&"RobigoRun"], camera_presets_default[&"Colonia"], camera_presets_default[&"Shinra"]]
@@ -47,7 +48,7 @@ func _move_camera(where: Transform3D, when: float) -> void:
 		else:
 			var _tween = _camera_tween_ref.get_ref()
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
-				_tween.kill()
+				(_tween as Tween).kill()
 			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when))
 
 func _handle_preset(index: int, tween: bool = true, store: bool = false) -> void:
@@ -56,7 +57,7 @@ func _handle_preset(index: int, tween: bool = true, store: bool = false) -> void
 			camera_presets.resize(index+1)
 		camera_presets[index] = $Camera.transform
 		print("stored camera preset %d: %s" % [index, camera_presets[index]])
-	elif len(camera_presets) > index && camera_presets[index] != Transform3D.IDENTITY:
+	elif len(camera_presets) > index && camera_presets[index] != Transform3D.IDENTITY:  ## IDENTITY is at Sol's center, looking south
 		_move_camera(camera_presets[index], camera_preset_speed if tween else 0.0)
 	else:
 		print("no camera preset at index %d" % index)
@@ -160,7 +161,6 @@ func _physics_process(delta: float) -> void:
 	if camera_vector.length():
 		## adjust to camera rotation
 		camera_vector = camera_vector.rotated(Vector3.UP, camera.rotation.y)
-		#camera.translate(camera_vector * camera_movement_speed * delta)
 		camera.transform = camera.transform.translated(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
@@ -173,7 +173,6 @@ func _physics_process(delta: float) -> void:
 		camera_vector += Vector3.BACK * Input.get_action_strength(&"zoom_out")
 
 	if camera_vector.length():
-		#camera.translate_object_local(camera_vector * camera_movement_speed * delta)
 		camera.transform = camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
 		camera_vector = Vector3.ZERO
 
@@ -181,32 +180,17 @@ func _physics_process(delta: float) -> void:
 	## Left/right rotates around global y axis
 	if Input.is_action_pressed(&"look_left"):
 		camera.rotate(Vector3.UP, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_left") * delta))
-#		camera_vector += Vector3.UP
 
 	if Input.is_action_pressed(&"look_right"):
 		camera.rotate(Vector3.DOWN, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_right") * delta))
-#		camera_vector += Vector3.DOWN
-
-#	if camera_vector.length():
-#		camera.rotate(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
-#		camera_vector = Vector3.ZERO
 
 
 	## Up/down rotates around local x axis
 	if Input.is_action_pressed(&"look_up"):
 		camera.rotate_object_local(Vector3.LEFT, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_up") * delta))
-#		camera_vector += Vector3.LEFT
 
 	if Input.is_action_pressed(&"look_down"):
 		camera.rotate_object_local(Vector3.RIGHT, deg_to_rad(camera_rotation_speed * Input.get_action_strength(&"look_down") * delta))
-#		camera_vector += Vector3.RIGHT
-
-#	if camera_vector.length():
-#		camera.rotate_object_local(camera_vector.normalized(), deg_to_rad(camera_rotation_speed * delta))
-#		camera_vector = Vector3.ZERO
-
-#	if camera_changed:
-#		camera.transform = camera_transform
 
 
 func _process(delta: float) -> void:
