@@ -74,14 +74,20 @@ modulate = Color(1, 0.827451, 0.541176, 1)
 
 [node name="StarManager" type="Node" parent="Map"]
 script = ExtResource("5_w6kjq")
+distance_factor = 1200.0
 
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
-wait_time = 123.0
+wait_time = 12.0
+autostart = true
+
+[node name="DeleteTimer" type="Timer" parent="Map/StarManager"]
+wait_time = 2.0
 autostart = true
 
 [node name="EDSMQuery" type="Node" parent="Map"]
 script = ExtResource("8_esshd")
-expire = 1800
+min_radius = 24
+expire = 23
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -144,16 +150,22 @@ clock_fudge = 2
 
 [node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("2_3lfp6")
-expire = 3600
+expire = 1800
 
 [node name="GenericEvent" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("14_4qmla")
-expire = 3600
+expire = 14400
+
+[node name="IdleTimer" type="Timer" parent="."]
+wait_time = 23.0
+autostart = true
 
 [connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
 [connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
+[connection signal="timeout" from="Map/StarManager/DeleteTimer" to="Map/StarManager" method="_on_delete_timer_timeout"]
 [connection signal="disconnected" from="Receiver/JSONWebSocketReceiver" to="UI/UI_EDDNEvent" method="_on_json_web_socket_receiver_disconnected"]
 [connection signal="received" from="Receiver/JSONWebSocketReceiver" to="Receiver/EDDNReceiver" method="_on_json_web_socket_receiver_received"]
 [connection signal="received" from="Receiver/EDDNReceiver" to="UI/UI_EDDNEvent" method="_on_eddn_receiver_received"]
 [connection signal="received" from="Receiver/EDDNReceiver" to="Receiver/EDDNReceiver/NavRoute" method="_on_eddn_receiver_received"]
 [connection signal="received" from="Receiver/EDDNReceiver" to="Receiver/EDDNReceiver/GenericEvent" method="_on_eddn_receiver_received"]
+[connection signal="timeout" from="IdleTimer" to="." method="_on_idle_timer_timeout"]
