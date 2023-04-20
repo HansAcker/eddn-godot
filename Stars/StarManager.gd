@@ -9,7 +9,7 @@ extends Node
 
 
 ## Increase star size by this factor on activity.
-@export var flare_size: float = 10.0
+@export var flare_size : float = 10.0
 
 ## Increase star size by this factor on first activity.
 @export var flare_size_new : float = 20.0
@@ -18,14 +18,14 @@ extends Node
 @export var distance_factor : float = 1000.0
 
 ## Time to full flare size in seconds.
-@export var flare_up: float = 0.1
+@export var flare_up : float = 0.1
 
 ## Time to normal size in seconds.
-@export var flare_down: float = 0.2
+@export var flare_down : float = 0.2
 
 
 ## TODO: UI quick hack. Think again.
-signal counter(count: int)
+signal counter(count : int)
 
 
 class _StarEntry:
@@ -39,18 +39,21 @@ class _StarEntry:
 	var pixel_size: float  ## original size, for tweening
 
 var _stars := {}
+var _delete_queue: Array[SpriteBase3D] = []
+var _expire_ticks := {}
 
 
 func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0, highlight: bool = true) -> void:
 	## get_ticks_msec() wraps after roughly 500 million years. don't run that long.
 	var expire_tick : int = Time.get_ticks_msec() + expire_msec if expire_msec > 0 else 0
-	var id := star_system.id
 
+	var id := star_system.id
 	if id == -1 || star_system.position == StarSystemRecord.POS_INVALID:
 		print("StarManager refusing to add invalid system: ", star_system)
 		return
 
 	## Scale highlight effects with distance to camera
+	## TODO: maybe exponential scale?
 	var dist_scale := maxf(1.0, get_viewport().get_camera_3d().position.distance_to(star_system.position) / distance_factor)
 
 	if (star_system.id in _stars):
@@ -60,25 +63,27 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 		## TODO: also update .system?
 
-		var _tween = star_entry.tween_ref.get_ref()
-		if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
-			## update alpha if larger
-			if (alpha > star_entry.alpha):
-				star_entry.alpha = alpha
-			## highlight activity
-			if highlight:
-				var tween := create_tween().set_parallel()
-				tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
-				tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here
-				tween.chain()
-				tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
-				tween.tween_property(star, "modulate", star_entry.color * star_entry.alpha, flare_up)  ## return to saved alpha
-				star_entry.tween_ref = weakref(tween)
+		## update alpha if larger
+		if (alpha > star_entry.alpha):
+			star_entry.alpha = alpha
+
+		## highlight activity only if no Tween already running
+		if highlight:
+			var _tween = star_entry.tween_ref.get_ref()
+			if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
+					var tween := create_tween().set_parallel()
+					tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
+					tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here, could be smaller than before
+					tween.chain()
+					tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
+					tween.tween_property(star, "modulate", star_entry.color * star_entry.alpha, flare_up)  ## return to saved alpha
+					star_entry.tween_ref = weakref(tween)
 
 		## update timeout
 		## TODO: could expire() delete the entry while in here?
 		if expire_tick > star_entry.expire_tick:
 			star_entry.expire_tick = expire_tick
+			_expire_ticks[id] = expire_tick
 
 		if system_entry.name.is_empty() && !star_system.name.is_empty():
 			system_entry.name = star_system.name
@@ -86,7 +91,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 		var _label := star_entry.label
 		if _label is Label3D:
-			(_label as Label3D).text = "%s" % [system_entry.name]
+			(_label as Label3D).text = "%s\n%s" % [system_entry.name, star_system.event_type]
 
 		## TODO: "Scan" events in multi-star systems change classes. Select main star.
 		## TODO: use .is_empty() on StringName or == &""?
@@ -94,7 +99,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		if system_entry.star_class.is_empty() && !star_system.star_class.is_empty():
 #			print("Star class changed: %s %s -> %s" % [star_system.name, system_entry.star_class, star_system.star_class])
 			## TODO: could just change color. but maybe also use different sprites.
-			delete_id(id)
+			delete_id(id, false)
 		else:
 			## TODO: better code-path
 			return
@@ -123,19 +128,27 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	star_entry.alpha = alpha
 	star_entry.pixel_size = star.pixel_size
 
+	if expire_tick:
+		_expire_ticks[id] = expire_tick
+
+	var tween = create_tween()
+	star_entry.tween_ref = weakref(tween)
+
 	if highlight:
-		var tween = create_tween()
 		## TODO: could it glow more with color values > 1.0?
 		tween.tween_property(star, "pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
 		tween.tween_property(star, "pixel_size", star.pixel_size, flare_down)
-		star_entry.tween_ref = weakref(tween)
 	else:
-		star_entry.tween_ref = weakref(null)
+		star.modulate = Color(0.0, 0.0, 0.0, 0.0)
+		tween.tween_property(star, "modulate", color * alpha, flare_up + flare_down)
 
 	var _label := star.get_node_or_null("Label")
 	if _label is Label3D:
-		star_entry.label = _label
-		(_label as Label3D).text = "%s" % [star_system.name]
+		var label := _label as Label3D
+		star_entry.label = label
+		label.text = "%s\n%s" % [star_system.name, star_system.event_type]
+		create_tween().tween_property(label, "modulate", label.modulate, flare_up + flare_down)
+		label.modulate = Color(0.0, 0.0, 0.0, 0.0)
 
 	_stars[star_system.id] = star_entry;
 
@@ -143,14 +156,27 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 	counter.emit(len(_stars))
 
 
-func delete_id(id: int) -> void:
+func delete_id(id: int, fade: bool = true) -> void:
 	if id in _stars:
 		if _stars[id] is _StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
 			var star_entry := _stars[id] as _StarEntry
 			var _tween = star_entry.tween_ref.get_ref()
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
-				_tween.kill()  ## stop animation
-			star_entry.star.queue_free()  ## remove star from scene
+				(_tween as Tween).kill()  ## stop animation
+
+			var remove_func := (func(star: Node3D) -> void:
+				remove_child(star)
+				_delete_queue.push_back(star)
+			).bind(star_entry.star)
+
+			if fade:
+				var tween := create_tween().set_parallel()
+				tween.finished.connect(remove_func)
+				tween.tween_property(star_entry.star, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
+				if is_instance_valid(star_entry.label) && is_instance_of(star_entry.label, Label3D):
+					tween.tween_property(star_entry.label, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
+			else:
+				remove_func.call()
 		_stars.erase(id)
 #		counter.emit(len(_stars))
 
@@ -161,27 +187,72 @@ func clear() -> void:
 		delete_id(star_key)
 		count += 1
 		if count >= 1000:
-			await get_tree().physics_frame  ## TODO: or process_frame? when does queue_free() free the node?
+			await get_tree().process_frame  ## TODO: or physics_frame? when does queue_free() free the node?
 			count = 0
 	counter.emit(len(_stars))
 
 
+#func expire() -> int:
+#	var now := Time.get_ticks_msec()
+#	var count : int = 0
+#
+#	## TODO: something more efficient than iterating over thousands of objects
+#	for star_key in _stars.keys():
+#		var star_entry := _stars[star_key] as _StarEntry
+#		if star_entry.expire_tick > 0 && now >= star_entry.expire_tick:
+#			count += 1
+#			delete_id(star_key)
+#
+#	counter.emit(len(_stars))
+#	return count
+
 func expire() -> int:
 	var now := Time.get_ticks_msec()
 	var count : int = 0
+	var i : int = 0
 
-	## TODO: something more efficient than iterating over thousands of objects
-	for star_key in _stars.keys():
-		var star_entry := _stars[star_key] as _StarEntry
-		if star_entry.expire_tick > 0 && now > star_entry.expire_tick:
-#			print("Expired Key: ", star_key, " Entry: ", star_entry)
+	## TODO: this probably isn't much better, anyway
+	for id in _expire_ticks.keys():
+		var expire_tick := _expire_ticks[id] as int
+		if now >= expire_tick:
 			count += 1
-			delete_id(star_key)
+			delete_id(id)
+			_expire_ticks.erase(id)
 
 	counter.emit(len(_stars))
 	return count
 
+
 func _on_expire_timer_timeout() -> void:
 	var ts := Time.get_ticks_usec()
 	var count := expire()
-#	print("StarManager.expire() took %dµs, removed %d nodes" % [(Time.get_ticks_usec() - ts), count])
+	print("StarManager expire took %dµs, removed %d nodes" % [(Time.get_ticks_usec() - ts), count])
+
+
+func _on_delete_timer_timeout() -> void:
+	if !len(_delete_queue):
+		return
+
+	## TODO: allow parallel runs or not? does it even work?
+	$DeleteTimer.stop()
+
+	var ts := Time.get_ticks_usec()
+	var count: int = 0
+	var i: int = 0
+
+	var _queue := _delete_queue
+	_delete_queue = []
+
+	$DeleteTimer.start()
+
+	for star in _queue:
+		if is_instance_valid(star):
+#			star.queue_free()
+			star.free()
+			count += 1
+			i += 1
+			if i >= 100:  ## TODO: arbitrary value. think again.
+				await get_tree().process_frame
+				i = 0
+
+	print("StarManager delete queue took %dµs, deleted %d nodes" % [(Time.get_ticks_usec() - ts), count])
