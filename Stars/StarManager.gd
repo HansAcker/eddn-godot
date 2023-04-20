@@ -39,7 +39,7 @@ class _StarEntry:
 	var pixel_size: float  ## original size, for tweening
 
 var _stars := {}
-var _delete_queue: Array[SpriteBase3D] = []
+var _delete_queue: Array[Node3D] = []
 var _expire_ticks := {}
 
 
@@ -70,7 +70,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 		## highlight activity only if no Tween already running
 		if highlight:
 			var _tween = star_entry.tween_ref.get_ref()
-			if !(is_instance_valid(_tween) && is_instance_of(_tween, Tween) && (_tween as Tween).is_running()):
+			if !(is_instance_valid(_tween) && _tween is Tween && (_tween as Tween).is_running()):
 					var tween := create_tween().set_parallel()
 					tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
 					tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here, could be smaller than before
@@ -161,7 +161,7 @@ func delete_id(id: int, fade: bool = true) -> void:
 		if _stars[id] is _StarEntry:  ## TODO: only checked here. how would an entry not be of StarEntry type?
 			var star_entry := _stars[id] as _StarEntry
 			var _tween = star_entry.tween_ref.get_ref()
-			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
+			if is_instance_valid(_tween) && _tween is Tween:
 				(_tween as Tween).kill()  ## stop animation
 
 			var remove_func := (func(star: Node3D) -> void:
@@ -173,7 +173,7 @@ func delete_id(id: int, fade: bool = true) -> void:
 				var tween := create_tween().set_parallel()
 				tween.finished.connect(remove_func)
 				tween.tween_property(star_entry.star, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
-				if is_instance_valid(star_entry.label) && is_instance_of(star_entry.label, Label3D):
+				if is_instance_valid(star_entry.label) && star_entry.label is Label3D:
 					tween.tween_property(star_entry.label, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
 			else:
 				remove_func.call()
@@ -240,12 +240,12 @@ func _on_delete_timer_timeout() -> void:
 	var count: int = 0
 	var i: int = 0
 
-	var _queue := _delete_queue
+	var queue := _delete_queue
 	_delete_queue = []
 
 	$DeleteTimer.start()
 
-	for star in _queue:
+	for star in queue:
 		if is_instance_valid(star):
 #			star.queue_free()
 			star.free()
