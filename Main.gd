@@ -60,7 +60,8 @@ var _camera_randomizer := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
-	_camera_randomizer.seed = 423.591
+	## TODO: make seed configurable
+	_camera_randomizer.seed = 42**23
 
 
 func _move_camera(where: Transform3D, when: float) -> void:
@@ -68,7 +69,7 @@ func _move_camera(where: Transform3D, when: float) -> void:
 			camera.transform = where
 		else:
 			var _tween = _camera_tween_ref.get_ref()
-			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
+			if is_instance_valid(_tween) && _tween is Tween:
 				(_tween as Tween).kill()
 
 			var tween := create_tween()
@@ -241,23 +242,23 @@ func _on_idle_timer_timeout() -> void:
 	if !idle_move:
 		return
 
+	## Stop camera movement
 	var _tween = _camera_tween_ref.get_ref()
-	if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
+	if is_instance_valid(_tween) && _tween is Tween:
 		(_tween as Tween).kill()
 
-#	_camera_randomizer.randomize()
-	var choice := _camera_randomizer.randf()
-	var move_to_pos := Vector3(_camera_randomizer.randf_range(-134.2, 134.2), _camera_randomizer.randf_range(-20.4, 234.2), _camera_randomizer.randf_range(-423.5, 234.2))
-
-	var look_at_pos := Vector3(randf_range(-52.2, 34.2), -10.0, randf_range(-23.5, 423.5))
-	var preset := randi_range(0, len(camera_presets)-1)
-
-	var camera_transform := camera.transform
-	if choice >= 0.85 && len(camera_presets) && _handle_preset(preset):
+	var choice := randf()
+	## TODO: make preset probability configurable
+	if choice >= 0.85 && len(camera_presets) && _handle_preset(randi_range(0, len(camera_presets)-1)):
 		idle_spin = false
 	else:
+		## use _camera_randomizer for position, default for orientation
+		## TODO: make bounding box and focus points configurable
+		var move_to_pos := Vector3(_camera_randomizer.randf_range(-134.2, 134.2), _camera_randomizer.randf_range(-20.4, 234.2), _camera_randomizer.randf_range(-423.5, 334.2))
+		var look_at_pos := Vector3(randf_range(-52.2, 34.2), -10.0, randf_range(-23.5, 423.5))
 		print("move to: ", move_to_pos, ", look at: ", look_at_pos)
 
+		var camera_transform := Transform3D()
 		camera_transform.origin = move_to_pos
 		camera_transform = camera_transform.looking_at(look_at_pos)
 
@@ -269,5 +270,6 @@ func _on_idle_timer_timeout() -> void:
 		## Populate space around the camera from EDSM
 		$Map/EDSMQuery.add_stars_at(camera_transform.origin)
 
+		## Reverse pan direction
 		idle_spin_speed = -idle_spin_speed
 		idle_spin = true
