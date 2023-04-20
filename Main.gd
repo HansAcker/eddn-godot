@@ -70,7 +70,10 @@ func _move_camera(where: Transform3D, when: float) -> void:
 			var _tween = _camera_tween_ref.get_ref()
 			if is_instance_valid(_tween) && is_instance_of(_tween, Tween):
 				(_tween as Tween).kill()
-			_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT))
+
+			var tween := create_tween()
+			tween.tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT)
+			_camera_tween_ref = weakref(tween)
 
 
 func _handle_preset(index: int, tween: bool = true, store: bool = false) -> bool:
@@ -257,8 +260,13 @@ func _on_idle_timer_timeout() -> void:
 
 		camera_transform.origin = move_to_pos
 		camera_transform = camera_transform.looking_at(look_at_pos)
-		_camera_tween_ref = weakref(create_tween().tween_property(camera, "transform", camera_transform, 6.0).set_trans(Tween.TRANS_QUINT))
 
+		## TODO: make transition configurable
+		var tween := create_tween()
+		tween.tween_property(camera, "transform", camera_transform, 6.0).set_trans(Tween.TRANS_QUINT)
+		_camera_tween_ref = weakref(tween)
+
+		## Populate space around the camera from EDSM
 		$Map/EDSMQuery.add_stars_at(camera_transform.origin)
 
 		idle_spin_speed = -idle_spin_speed
