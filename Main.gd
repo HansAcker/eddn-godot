@@ -7,9 +7,10 @@ extends Node3D
 
 ## Camera presets
 const camera_presets_default := {
-	&"RobigoRun" : Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
-	&"Colonia" : Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
-	&"Shinra" : Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
+	&"Overview": Transform3D(Vector3(-0.939693, 0, -0.34202), Vector3(-0.196175, 0.819152, 0.538985), Vector3(0.280167, 0.573577, -0.769751), Vector3(4000, 4000, -4000)),
+	&"RobigoRun": Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
+	&"Colonia": Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
+	&"Shinra": Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
 }
 
 
@@ -30,7 +31,12 @@ const camera_presets_default := {
 @export var camera_rotation_speed : float = 36.0 * 3.0
 
 ## Pre-defined camera views.
-@export var camera_presets : Array[Transform3D] = [camera_presets_default[&"RobigoRun"], camera_presets_default[&"Colonia"], camera_presets_default[&"Shinra"]]
+@export var camera_presets: Array[Transform3D] = [
+	camera_presets_default[&"Overview"],
+	camera_presets_default[&"RobigoRun"],
+	camera_presets_default[&"Shinra"],
+	camera_presets_default[&"Colonia"],
+]
 
 ## Seconds to reach preset view.
 @export var camera_preset_speed: float = 1.0

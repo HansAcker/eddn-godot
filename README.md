@@ -18,7 +18,7 @@ Websocket server code [here](https://github.com/HansAcker/EDDN-RealTime/tree/mas
 Camera movement with joystick axes or WASD/RF/QE/YC.
 Home to get home. Del to remove all stars.
 
-Press "0" to watch Robigo Runners, "1" to see Colonia, etc.
+Press "1" to watch Robigo Runners, "3" to see Colonia, etc.
 Press Ctrl + 0/1/2/3 to save a preset.
 
 [![EDDN in Godot](https://img.youtube.com/vi/S_Mk0Nnx4aM/0.jpg)](https://www.youtube.com/watch?v=S_Mk0Nnx4aM "EDDN in Godot")
