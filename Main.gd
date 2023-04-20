@@ -113,10 +113,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		handled = true
 	elif event.is_action_pressed(&"pause2"):
 		idle_move = !idle_move
-		if idle_move:
-			idle_timer.start()
-		else:
-			idle_timer.stop()
+#		if idle_move:
+#			idle_timer.start()
+#		else:
+#			idle_timer.stop()
 		handled = true
 	elif event.is_action_pressed(&"edsm_fetch"):
 		$Map/EDSMQuery.add_stars_at(camera.position)
@@ -134,6 +134,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var handled := false
 
 	## TODO: match something instead of ifs?
+	##       or ["&preset_0", &"preset_1"]...find(action)?
 
 	if event.is_action_pressed(&"ui_home"):
 		_move_camera(camera_home, 1.0 if !event.shift_pressed else 0.0)
@@ -161,6 +162,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		handled = true
 	elif event.is_action_pressed(&"preset_3"):
 		_handle_preset(3, !event.shift_pressed, event.ctrl_pressed)
+		handled = true
+	elif event.is_action_pressed(&"preset_4"):
+		_handle_preset(4, !event.shift_pressed, event.ctrl_pressed)
+		handled = true
+	elif event.is_action_pressed(&"preset_5"):
+		_handle_preset(5, !event.shift_pressed, event.ctrl_pressed)
+		handled = true
+	elif event.is_action_pressed(&"preset_6"):
+		_handle_preset(6, !event.shift_pressed, event.ctrl_pressed)
 		handled = true
 
 	if handled:
