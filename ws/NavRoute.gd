@@ -26,7 +26,8 @@ func _on_eddn_receiver_received(event_type: StringName, message: Dictionary, _st
 
 	## TODO: configurable alpha scale
 	var alpha := 1.0 - (clampi(age, 0, 2800) / 4000.0) if age > 10 else 1.0
-
+	route[0].event = &"NavRoute From"
+	route[len(route)-1].event = &"NavRoute To"
 #	var line : Array[Vector3] = [StarSystemRecord.parse(route[0]).position]
 
 	for _wp in route:

@@ -10,8 +10,9 @@ const POS_INVALID := Vector3(0.0, 100e3, 0.0) ## arbitrary dummy location. TODO:
 
 var name: String
 var id: int  ## ED id64 field
-var star_class: StringName  ## Main star class
 var position: Vector3
+var star_class: StringName  ## Main star class
+var event_type: StringName  ## Last event type seen
 
 
 static func parse_system_name(from: Dictionary) -> String:
@@ -55,6 +56,13 @@ static func parse_starpos(from: Dictionary) -> Vector3:
 		return POS_INVALID
 	return Vector3(-starpos[0], starpos[1], starpos[2])  ## +x in ED is -x in this world
 
+static func parse_event_type(from: Dictionary) -> StringName:
+	var event_type = from.get("event")
+	if (event_type is String || event_type is StringName) && !event_type.is_empty():
+		return StringName(event_type)
+
+	return &""
+
 static func parse(from: Dictionary) -> StarSystemRecord:
 	var star_system := StarSystemRecord.new()
 
@@ -62,5 +70,6 @@ static func parse(from: Dictionary) -> StarSystemRecord:
 	star_system.id = parse_system_id(from)
 	star_system.star_class = parse_star_class(from)
 	star_system.position = parse_starpos(from)
+	star_system.event_type = parse_event_type(from)
 
 	return star_system
