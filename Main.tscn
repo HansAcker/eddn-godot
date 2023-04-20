@@ -18,8 +18,8 @@
 [sub_resource type="Environment" id="Environment_xftdg"]
 background_mode = 1
 glow_enabled = true
-glow_intensity = 2.0
-glow_bloom = 1.0
+glow_intensity = 1.0
+glow_bloom = 0.7
 glow_blend_mode = 0
 fog_light_color = Color(0.392157, 0.392157, 0.392157, 1)
 fog_density = 0.0025
@@ -33,7 +33,7 @@ cull_mode = 2
 depth_draw_mode = 2
 shading_mode = 0
 disable_ambient_light = true
-albedo_color = Color(1, 1, 1, 0.0117647)
+albedo_color = Color(1, 1, 1, 0.00784314)
 albedo_texture = ExtResource("3_fd031")
 disable_receive_shadows = true
 
