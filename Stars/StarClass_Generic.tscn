@@ -5,7 +5,7 @@
 
 [node name="StarClass_Generic" type="Sprite3D"]
 visibility_range_begin = 20.0
-visibility_range_begin_margin = 15.0
+visibility_range_begin_margin = 10.0
 visibility_range_fade_mode = 1
 billboard = 1
 alpha_cut = 2
@@ -15,9 +15,9 @@ texture = ExtResource("1_dcejw")
 [node name="Label" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 visibility_range_begin = 20.0
-visibility_range_begin_margin = 15.0
-visibility_range_end = 70.0
-visibility_range_end_margin = 20.0
+visibility_range_begin_margin = 10.0
+visibility_range_end = 80.0
+visibility_range_end_margin = 10.0
 visibility_range_fade_mode = 1
 offset = Vector2(0, -250)
 billboard = 1
