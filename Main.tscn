@@ -86,6 +86,7 @@ autostart = true
 
 [node name="EDSMQuery" type="Node" parent="Map"]
 script = ExtResource("8_esshd")
+radius = 30
 min_radius = 24
 expire = 23
 
