@@ -140,6 +140,7 @@ script = ExtResource("6_127la")
 
 [node name="EDDNReceiver" type="Node" parent="Receiver"]
 script = ExtResource("2_g4fw5")
+clock_fudge = 2
 
 [node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("2_3lfp6")

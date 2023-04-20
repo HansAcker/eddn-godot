@@ -18,6 +18,9 @@ extends Node
 		cut_off = value
 		update_configuration_warnings()
 
+## Offset added to local time.
+@export var clock_fudge : int = 0
+
 
 ## Emitted when an EDDN event was received.
 signal received(event_type: StringName, message: Dictionary, star_system: StarSystemRecord, age: int)
@@ -43,7 +46,7 @@ func _on_json_web_socket_receiver_received(data: Dictionary) -> void:
 		print("EDDN message contains invalid timestamp")
 		return
 
-	var age := (ceilf(Time.get_unix_time_from_system()) as int) - ts;
+	var age := (ceilf(Time.get_unix_time_from_system()) as int) + clock_fudge - ts;
 	if cut_off >= 0 && age > cut_off:
 		## ignore old data
 		return
