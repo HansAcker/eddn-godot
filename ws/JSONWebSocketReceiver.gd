@@ -7,6 +7,7 @@ extends Node
 ## TODO: receive timeout watchdog
 ## TODO: The websocket sometimes just closes the connection while
 ##       get_ready_state() still returns WebSocketPeer.STATE_OPEN
+## TODO: sort out _retry vs reconnect
 
 
 ## The URL of the websocket service.
@@ -42,7 +43,9 @@ func reconnect() -> void:
 
 func _retry() -> void:
 	## TODO: only a single timer should run
-	get_tree().create_timer(retry_delay + (randf() * 2.3), true, true, true).timeout.connect(_ws_connect)
+	var delay := retry_delay + (randf() * 2.3)
+	print("Retry in %.1fs" % delay)
+	get_tree().create_timer(delay, true, true, true).timeout.connect(reconnect)
 
 
 func _ws_connect() -> void:
@@ -57,6 +60,8 @@ func _ws_connect() -> void:
 
 		_retry()
 		set_process(false)
+
+	receive_timer.start()
 
 
 func _ready() -> void:
