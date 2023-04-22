@@ -48,7 +48,7 @@ func _ready():
 				var pos_z := (randf()-0.5) * zscale
 				var pos_y := randfn(0.0, 0.5) * 5_000.0 * edge_xy.length()  ## TODO: proper distribution
 
-				var pos := Transform3D.IDENTITY.translated(Vector3(pos_x + (xscale * x), pos_y, pos_z + (zscale * y)))
+				var pos := Transform3D(Basis(), Vector3(pos_x + (xscale * x), pos_y, pos_z + (zscale * y)))
 				instances.push_back([pos, pixel])
 
 	print("Galaxy fluff multimesh instance count: %d" % len(instances))
