@@ -11,7 +11,6 @@ texture_filter = 1
 texture_repeat = false
 disable_receive_shadows = true
 billboard_mode = 1
-point_size = 15.9
 distance_fade_mode = 2
 distance_fade_min_distance = 400.0
 distance_fade_max_distance = 1000.0
