@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://c4rjg7p7fmipt"]
+[gd_scene load_steps=23 format=3 uid="uid://c4rjg7p7fmipt"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
 [ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://ws/EDDNReceiver.gd" id="2_g4fw5"]
 [ext_resource type="Texture2D" uid="uid://tu51wfur5kq7" path="res://Stars/textures/galaxy.jpg" id="3_fd031"]
 [ext_resource type="PackedScene" uid="uid://c7ssby8abrgs6" path="res://Stars/StarClass_Generic.tscn" id="5_b0o3s"]
+[ext_resource type="QuadMesh" uid="uid://d0la8tdf1e86c" path="res://Stars/FluffMesh.tres" id="5_ef24c"]
+[ext_resource type="Script" path="res://Stars/Fluff.gd" id="5_tnxg1"]
 [ext_resource type="Script" path="res://Stars/StarManager.gd" id="5_w6kjq"]
 [ext_resource type="Script" path="res://ws/JSONWebSocketReceiver.gd" id="6_127la"]
 [ext_resource type="Script" path="res://Stars/EDSMQuery.gd" id="8_esshd"]
@@ -33,13 +35,18 @@ cull_mode = 2
 depth_draw_mode = 2
 shading_mode = 0
 disable_ambient_light = true
-albedo_color = Color(1, 1, 1, 0.00784314)
+albedo_color = Color(1, 1, 1, 0.0117647)
 albedo_texture = ExtResource("3_fd031")
 disable_receive_shadows = true
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_bnbkk"]
 material = SubResource("StandardMaterial3D_nkkv3")
 size = Vector2(104000, 104000)
+
+[sub_resource type="MultiMesh" id="MultiMesh_g54w7"]
+transform_format = 1
+use_colors = true
+mesh = ExtResource("5_ef24c")
 
 [sub_resource type="SystemFont" id="SystemFont_m3hyb"]
 font_names = PackedStringArray("Lucida Console", "Monospace")
@@ -49,10 +56,11 @@ default_font = SubResource("SystemFont_m3hyb")
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_wod4n")
-idle_spin = false
+idle_move = true
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(-0.939693, -0.196175, 0.280167, 0, 0.819152, 0.573577, -0.34202, 0.538985, -0.769751, 4000, 4000, -4000)
+fov = 85.0
 far = 100000.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -68,6 +76,10 @@ mesh = SubResource("PlaneMesh_bnbkk")
 pixel_size = 0.2
 texture = ExtResource("2_btkb5")
 
+[node name="Fluff" type="MultiMeshInstance3D" parent="Map/Galaxy"]
+multimesh = SubResource("MultiMesh_g54w7")
+script = ExtResource("5_tnxg1")
+
 [node name="Sol" parent="Map" instance=ExtResource("5_b0o3s")]
 visible = false
 modulate = Color(1, 0.827451, 0.541176, 1)
@@ -77,10 +89,12 @@ script = ExtResource("5_w6kjq")
 distance_factor = 1200.0
 
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
+process_callback = 0
 wait_time = 12.0
 autostart = true
 
 [node name="DeleteTimer" type="Timer" parent="Map/StarManager"]
+process_callback = 0
 wait_time = 2.0
 autostart = true
 
