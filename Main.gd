@@ -11,27 +11,23 @@ const camera_presets_default := {
 	&"RobigoRun": Transform3D(Vector3(0.8739, 0, -0.486092), Vector3(-0.107088, 0.975431, -0.192521), Vector3(0.474148, 0.220304, 0.852429), Vector3(338, 16, -309)),
 	&"Colonia": Transform3D(Vector3(0.952749, 0, -0.303735), Vector3(0.058642, 0.981182, 0.183953), Vector3(0.298019, -0.193074, 0.93482), Vector3(9547.755, -903.6143, 19846.2)),
 	&"Shinra": Transform3D(Vector3(-0.333609, 0, 0.942708), Vector3(0.193754, 0.97865, 0.068566), Vector3(-0.922581, 0.205529, -0.326487), Vector3(-91.55039, 24.33843, 0.598375)),
+	&"Sol": Transform3D(Vector3(0.467023, 0, -0.884234), Vector3(0.317198, 0.933437, 0.167534), Vector3(0.825379, -0.358726, 0.435939), Vector3(22.57196, -9.927534, 12.79236)),
 }
 
 
-## Idly spin around the y axis. Press "pause" input to stop/start.
-@export var idle_spin: bool = true
-
-## Seconds per rotation.
-## TODO: add configuration warning. must not be 0. negative values rotate clockwise.
-@export var idle_spin_speed: int = 120
-
-## Idly move the camera around. Press "pause2" input to stop/start
-@export var idle_move: bool = true
+@export_group("Camera", "camera_")
 
 ## Camera movement speed in ly/s
-@export var camera_movement_speed: float = 400.0
+@export var camera_movement_speed: float = 300.0
 
 ## Camera movement speed factor when shift key pressed.
 #@export var camera_movement_shift: float = 3.0
 
 ## Camera rotation speed in deg/s
-@export var camera_rotation_speed: float = 36.0 * 3.0
+@export var camera_rotation_speed: float = 36.0 * 2.0
+
+## Seconds to reach preset view.
+@export var camera_preset_speed: float = 3.0
 
 ## Pre-defined camera views.
 @export var camera_presets: Array[Transform3D] = [
@@ -39,42 +35,61 @@ const camera_presets_default := {
 	camera_presets_default[&"RobigoRun"],
 	camera_presets_default[&"Shinra"],
 	camera_presets_default[&"Colonia"],
+	camera_presets_default[&"Sol"],
 ]
 
-## Seconds to reach preset view.
-@export var camera_preset_speed : float = 3.0
+
+## Idly spin around the y axis. Press "pause" input to stop/start.
+#@export var idle_spin: bool = false
+
+## Seconds per rotation.
+## TODO: add configuration warning. must not be 0. negative values rotate clockwise.
+#@export var idle_spin_speed: int = 120
+
+## Idly move the camera around. Press "pause" input to stop/start
+@export var idle_move: bool = false
+
+## Random seed for idle move positions. Useful if fetching EDSM data from a cache.
+## Set to 0 for randomness.
+@export var idle_move_seed: int = 42**23
 
 
+## Save references
+## TODO: explain why this is supposedly better than using $Node everywhere?
+## TODO: prefix with _ or not?
 @onready var camera := $Camera as Node3D
+@onready var edsm_handler := $Map/EDSMQuery  ## TODO: set class_name?
+@onready var star_manager := $Map/StarManager as StarManager
+@onready var idle_timer := $IdleTimer as Timer
+@onready var ws_receiver := $Receiver/JSONWebSocketReceiver  ## TODO: set class_name?
 
 ## Save initial camera view
-@onready var camera_home : Transform3D = camera.transform
+@onready var camera_home: Transform3D = camera.transform
 
-@onready var idle_timer : Timer = $IdleTimer
 
 ## Keep a weak reference only, so finished Tweens can be freed
 var _camera_tween_ref: WeakRef = weakref(null)
 
-## Fixed-seed seudorandomness for idle move positions, so EDSM requests can be cached
 var _camera_randomizer := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
-	## TODO: make seed configurable
-	_camera_randomizer.seed = 42**23
+	randomize()
+	if idle_move_seed:
+		_camera_randomizer.seed = idle_move_seed
 
 
 func _move_camera(where: Transform3D, when: float) -> void:
-		if is_zero_approx(when):
-			camera.transform = where
-		else:
-			var _tween = _camera_tween_ref.get_ref()
-			if is_instance_valid(_tween) && _tween is Tween:
-				(_tween as Tween).kill()
+	if is_zero_approx(when):
+		camera.transform = where
+	else:
+		var _tween = _camera_tween_ref.get_ref()
+		if is_instance_valid(_tween) && _tween is Tween:
+			(_tween as Tween).kill()
 
-			var tween := create_tween()
-			tween.tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT)
-			_camera_tween_ref = weakref(tween)
+		var tween := create_tween()
+		tween.tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT)
+		_camera_tween_ref = weakref(tween)
 
 
 func _handle_preset(index: int, tween: bool = true, store: bool = false) -> bool:
@@ -93,6 +108,49 @@ func _handle_preset(index: int, tween: bool = true, store: bool = false) -> bool
 	print("no camera preset at index %d" % index)
 	return false
 
+func _random_camera_move() -> void:
+		## Stop camera movement
+	var _tween = _camera_tween_ref.get_ref()
+	if is_instance_valid(_tween) && _tween is Tween:
+		(_tween as Tween).kill()
+		print("Tween killed")
+
+	var choice := randf()
+	## TODO: make preset probability configurable
+	if choice >= 0.90 && len(camera_presets) && _handle_preset(randi_range(0, len(camera_presets)-1)):
+		pass
+#		idle_spin = false
+	else:
+		## use _camera_randomizer for position, default for orientation
+		## TODO: make bounding box and focus points configurable
+		## TODO: ensure "the direction from the node's position to the target vector cannot be parallel to the up vector"
+		var move_to_pos := Vector3(_camera_randomizer.randf_range(-134.2, 134.2), _camera_randomizer.randf_range(-20.4, 234.2), _camera_randomizer.randf_range(-423.5, 334.2))
+		var look_at_pos := Vector3(randf_range(-34.2, 52.2), -10.0, randf_range(-23.5, 42.5))
+		print("move to: ", move_to_pos, ", look at: ", look_at_pos)
+
+		var camera_transform := Transform3D()
+		camera_transform.origin = move_to_pos
+		camera_transform = camera_transform.looking_at(look_at_pos)
+		var final_transform := Transform3D(camera_transform.basis, Vector3.ZERO).rotated(Vector3.UP, PI * (1.0 if randf() >= 0.5 else -1.0)).translated(camera_transform.origin)
+
+		## TODO: make transition configurable
+		var tween := create_tween()
+		tween.tween_property(camera, "transform", camera_transform, 6.0).set_trans(Tween.TRANS_QUINT)
+		tween.tween_property(camera, "transform", final_transform, 60.0)
+		_camera_tween_ref = weakref(tween)
+
+#		var xtween := create_tween()
+#		xtween.tween_property(camera, "fov", 90.0, 1.0).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+#		xtween.tween_property(camera, "fov", 65.0, 3.0).set_ease(Tween.EASE_OUT)
+
+		## Populate space around the camera from EDSM
+		edsm_handler.add_stars_at(camera_transform.origin)
+
+#		## Reverse pan direction
+#		idle_spin_speed = -idle_spin_speed
+#		idle_spin_speed = -idle_spin_speed if randf() >= 0.5 else idle_spin_speed
+#		idle_spin = true
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	var handled := false
@@ -100,8 +158,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	## toggle fullscreen	
 	## TODO: often hangs and crashes. also on resizing or moving the window. why?
 	if event.is_action_pressed(&"toggle_fullscreen"):
-#		print(DisplayServer.window_get_mode())
-#		if DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_MAXIMIZED, DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]:
 		if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 			print("fullscreen off")
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
@@ -113,20 +169,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		handled = true
 	elif event.is_action_pressed(&"pause"):
-		idle_spin = !idle_spin
-		handled = true
-	elif event.is_action_pressed(&"pause2"):
+#		idle_spin = !idle_spin
+#		handled = true
+#	elif event.is_action_pressed(&"pause2"):
 		idle_move = !idle_move
-#		if idle_move:
-#			idle_timer.start()
-#		else:
-#			idle_timer.stop()
+		if idle_move:
+			_random_camera_move()
 		handled = true
 	elif event.is_action_pressed(&"edsm_fetch"):
-		$Map/EDSMQuery.add_stars_at(camera.position)
+		edsm_handler.add_stars_at(camera.position)
 		handled = true
 	elif event.is_action_pressed(&"random_move"):
-		_on_idle_timer_timeout()
+		_random_camera_move()
 		handled = true
 
 	if handled:
@@ -144,10 +198,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_move_camera(camera_home, 1.0 if !event.shift_pressed else 0.0)
 		handled = true
 	elif event.is_action_pressed(&"clear"):
-		$Map/StarManager.clear()
+		star_manager.clear()
 		handled = true
 	elif event.is_action_pressed(&"reconnect"):
-		$Receiver/JSONWebSocketReceiver.reconnect()
+		ws_receiver.reconnect()
 		handled = true
 	elif event.is_action_pressed(&"print_transform"):
 		var camera_transform := camera.transform
@@ -184,39 +238,34 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	var handled := false
-	var camera_vector := Vector3.ZERO
-	var input_vector : Vector2
-
-#	var camera_transform := $Camera.transform as Transform3D
-#	var camera_changed := false
+	var input_vector: Vector2
+	var change_vector := Vector3.ZERO
 
 	## TODO: handle shift for faster movement with keys
 	## TODO: use Node3D.translate()/rotate() or transform?
-	## TODO: reconcile normalizing vectors with input strength
 	## TODO: implement "zoom": scale movement speed with zoom factor
 	## TODO: use mouse wheel for zoom
+	## TODO: better use approx_zero instead of change_vector.length? it works, though
 
-
-	## Camera movement: Input strength included in get_axis() value
 
 	## Movement along global axes
 	input_vector = Input.get_vector(&"move_left", &"move_right", &"move_forward", &"move_back")
-	camera_vector = Vector3(input_vector.x, Input.get_axis(&"move_down", &"move_up"), input_vector.y)
+	change_vector = Vector3(input_vector.x, Input.get_axis(&"move_down", &"move_up"), input_vector.y)
 
-	if camera_vector.length():
+	if change_vector.length():
 		## adjust to camera rotation
-		camera_vector = camera_vector.rotated(Vector3.UP, camera.rotation.y)
-		camera.transform = camera.transform.translated(camera_vector * camera_movement_speed * delta)
-		camera_vector = Vector3.ZERO
+		change_vector = change_vector.rotated(Vector3.UP, camera.rotation.y)
+		camera.transform = camera.transform.translated(change_vector * camera_movement_speed * delta)
+		change_vector = Vector3.ZERO
 		handled = true
 
 
 	## Movement along local axes
-	camera_vector = Vector3.FORWARD * Input.get_axis(&"move_back2", &"move_forward2")
+	change_vector = Vector3.FORWARD * Input.get_axis(&"move_back2", &"move_forward2")
 
-	if camera_vector.length():
-		camera.transform = camera.transform.translated_local(camera_vector * camera_movement_speed * delta)
-		camera_vector = Vector3.ZERO
+	if change_vector.length():
+		camera.transform = camera.transform.translated_local(change_vector * camera_movement_speed * delta)
+		change_vector = Vector3.ZERO
 		handled = true
 
 
@@ -234,42 +283,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
-	if idle_spin:
-		camera.rotate_y((int(delta * 1000.0) % (idle_spin_speed * 1000)) / (idle_spin_speed * 1000.0) * 2.0 * PI)
+	pass
 
 
 func _on_idle_timer_timeout() -> void:
 	if !idle_move:
 		return
 
-	## Stop camera movement
-	var _tween = _camera_tween_ref.get_ref()
-	if is_instance_valid(_tween) && _tween is Tween:
-		(_tween as Tween).kill()
-
-	var choice := randf()
-	## TODO: make preset probability configurable
-	if choice >= 0.85 && len(camera_presets) && _handle_preset(randi_range(0, len(camera_presets)-1)):
-		idle_spin = false
-	else:
-		## use _camera_randomizer for position, default for orientation
-		## TODO: make bounding box and focus points configurable
-		var move_to_pos := Vector3(_camera_randomizer.randf_range(-134.2, 134.2), _camera_randomizer.randf_range(-20.4, 234.2), _camera_randomizer.randf_range(-423.5, 334.2))
-		var look_at_pos := Vector3(randf_range(-52.2, 34.2), -10.0, randf_range(-23.5, 423.5))
-		print("move to: ", move_to_pos, ", look at: ", look_at_pos)
-
-		var camera_transform := Transform3D()
-		camera_transform.origin = move_to_pos
-		camera_transform = camera_transform.looking_at(look_at_pos)
-
-		## TODO: make transition configurable
-		var tween := create_tween()
-		tween.tween_property(camera, "transform", camera_transform, 6.0).set_trans(Tween.TRANS_QUINT)
-		_camera_tween_ref = weakref(tween)
-
-		## Populate space around the camera from EDSM
-		$Map/EDSMQuery.add_stars_at(camera_transform.origin)
-
-		## Reverse pan direction
-		idle_spin_speed = -idle_spin_speed
-		idle_spin = true
+	_random_camera_move()
