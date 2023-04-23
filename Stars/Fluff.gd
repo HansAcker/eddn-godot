@@ -22,16 +22,17 @@ func _ready():
 	var ipp := int((104000**2) / (size.x * size.y) / 10000)
 	
 	## Relative distance from edges, used to scale ipp and height
+	## TODO: clamp to [0, 1]? use something else?
 	var edge_xy : Vector2
 
 	## TODO: use image.get_data() and process the array instead of image.get_pixel?
 
 	for x in range(-size.x/2, size.x/2):
-		var pixel_x = (size.x/2) - x - 1
+		var pixel_x = x + (size.x/2)
 		edge_xy.x = 1 - inverse_lerp(0.0, size.x/2, abs(x))
 
 		for y in range(-size.y/2, size.y/2):
-			var pixel_y = (size.y/2) - y - 1
+			var pixel_y = y + (size.y/2)
 			edge_xy.y = 1 - inverse_lerp(0.0, size.y/2, abs(y))
 
 			var pixel := image.get_pixel(pixel_x, pixel_y).srgb_to_linear()*10  ## TODO: explain scale, make configurable
