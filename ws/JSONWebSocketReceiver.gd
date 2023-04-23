@@ -52,7 +52,7 @@ func _ws_connect() -> void:
 	receive_timer.wait_time = 12.3 + (randf() * 23.5)
 	set_process(true)
 
-	 ## EDDN messages can be larger than 64kB (default buffer size)
+	## EDDN messages can be larger than 64kB (default buffer size)
 	_socket.set_inbound_buffer_size(2**20)  ## 2^20bits = 1MB buffer size
 
 	var rc := _socket.connect_to_url(ws_url)
