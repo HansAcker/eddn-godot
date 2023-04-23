@@ -22,3 +22,7 @@ Press "1" to watch Robigo Runners, "3" to see Colonia, etc.
 Press Ctrl + 0/1/2/3 to save a preset.
 
 [![EDDN in Godot](https://img.youtube.com/vi/S_Mk0Nnx4aM/0.jpg)](https://www.youtube.com/watch?v=S_Mk0Nnx4aM "EDDN in Godot")
+
+
+Performance TODO:
+Adding thousands of sprites and labels to the scene is not the problem, the sprite texture transparency is.
