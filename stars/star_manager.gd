@@ -97,11 +97,11 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 			var _tween = star_entry.tween_ref.get_ref()
 			if !(is_instance_valid(_tween) && _tween is Tween && (_tween as Tween).is_running()):
 				var tween := create_tween().set_parallel()
-				tween.tween_property(star, "pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
-				tween.tween_property(star, "modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here, could be smaller than before
+				tween.tween_property(star, ^"pixel_size", star_entry.pixel_size * flare_size * dist_scale, flare_up)
+				tween.tween_property(star, ^"modulate", star_entry.color * alpha, flare_up).set_trans(Tween.TRANS_EXPO)  ## use event alpha here, could be smaller than before
 				tween.chain()
-				tween.tween_property(star, "pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
-				tween.tween_property(star, "modulate", star_entry.color * star_entry.alpha, flare_up)  ## return to saved alpha
+				tween.tween_property(star, ^"pixel_size", star_entry.pixel_size, flare_down).set_trans(Tween.TRANS_EXPO)
+				tween.tween_property(star, ^"modulate", star_entry.color * star_entry.alpha, flare_up)  ## return to saved alpha
 				star_entry.tween_ref = weakref(tween)
 
 		## update timeout
@@ -167,10 +167,10 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 	if highlight:
 		## TODO: could it glow more with color values > 1.0?
-		tween.tween_property(star, "pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
-		tween.tween_property(star, "pixel_size", star.pixel_size, flare_down)
+		tween.tween_property(star, ^"pixel_size", star.pixel_size * flare_size_new * dist_scale, flare_up)
+		tween.tween_property(star, ^"pixel_size", star.pixel_size, flare_down)
 	else:
-		tween.tween_property(star, "modulate", star.modulate, flare_up + flare_down)
+		tween.tween_property(star, ^"modulate", star.modulate, flare_up + flare_down)
 		star.modulate = Color(0.0, 0.0, 0.0, 0.0)
 
 	var _label := star.get_node_or_null("Label")
@@ -180,7 +180,7 @@ func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0
 
 		label.text = "%s\n%s" % [star_system.name, star_system.event_type]
 
-		create_tween().tween_property(label, "modulate", label.modulate, flare_up + flare_down)
+		create_tween().tween_property(label, ^"modulate", label.modulate, flare_up + flare_down)
 		label.modulate = Color(0.0, 0.0, 0.0, 0.0)
 
 	_stars[star_system.id] = star_entry;
@@ -207,9 +207,9 @@ func delete_id(id: int, fade: bool = true) -> void:
 			if fade:
 				var tween := create_tween().set_parallel()
 				tween.finished.connect(remove_func)
-				tween.tween_property(star_entry.star, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
+				tween.tween_property(star_entry.star, ^"modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
 				if is_instance_valid(star_entry.label) && star_entry.label is Label3D:
-					tween.tween_property(star_entry.label, "modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
+					tween.tween_property(star_entry.label, ^"modulate", Color(0.0, 0.0, 0.0, 0.0), flare_up + flare_down)
 			else:
 				remove_func.call()
 

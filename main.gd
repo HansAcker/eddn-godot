@@ -221,7 +221,7 @@ func _move_camera(where: Transform3D, when: float) -> void:
 		camera.transform = where
 	else:
 		var tween := create_tween()
-		tween.tween_property(camera, "transform", where, when).set_trans(Tween.TRANS_QUINT)
+		tween.tween_property(camera, ^"transform", where, when).set_trans(Tween.TRANS_QUINT)
 		_camera_tween_ref = weakref(tween)
 
 
@@ -269,8 +269,8 @@ func _random_camera_move() -> void:
 		## TODO: make transition configurable
 		_stop_camera_tween()
 		var tween := create_tween()
-		tween.tween_property(camera, "transform", camera_transform, 8.0).set_trans(Tween.TRANS_QUINT)
-		tween.tween_property(camera, "transform", final_transform, 90.0)
+		tween.tween_property(camera, ^"transform", camera_transform, 8.0).set_trans(Tween.TRANS_QUINT)
+		tween.tween_property(camera, ^"transform", final_transform, 90.0)
 		_camera_tween_ref = weakref(tween)
 
 		## TODO: camera FoV effects?
