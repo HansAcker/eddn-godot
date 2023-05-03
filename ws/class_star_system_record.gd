@@ -9,7 +9,7 @@ class_name StarSystemRecord
 const POS_INVALID := Vector3(0.0, 100e3, 0.0) ## arbitrary dummy location. TODO: use something else?
 
 var name: String
-var id: int  ## ED id64 field
+var id: int  ## ED id64 field. unsigned int64. 55 bits used for systems, should fit into Godot's signed int64. see http://disc.thargoid.space/ID64
 var position: Vector3
 var star_class: StringName  ## Main star class
 var event_type: StringName  ## Last event type seen
