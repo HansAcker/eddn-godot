@@ -315,6 +315,10 @@ func _on_expire_timer_timeout() -> void:
 	_expire()
 
 
+func expire() -> void:
+	_expire()
+
+
 func _on_freeze_timer_timeout() -> void:
 	_expire(true)
 

@@ -3,12 +3,12 @@
 importer="font_data_dynamic"
 type="FontFile"
 uid="uid://cy1v2mvb86jhx"
-path="res://.godot/imported/Orbitron Light.ttf-eb556ba17b58c70ec7be14184edfecca.fontdata"
+path="res://.godot/imported/Orbitron Light.ttf-db9cb7086dd2b46f64170d20f440bfb1.fontdata"
 
 [deps]
 
-source_file="res://Stars/fonts/orbitron/Orbitron Light.ttf"
-dest_files=["res://.godot/imported/Orbitron Light.ttf-eb556ba17b58c70ec7be14184edfecca.fontdata"]
+source_file="res://stars/fonts/orbitron/Orbitron Light.ttf"
+dest_files=["res://.godot/imported/Orbitron Light.ttf-db9cb7086dd2b46f64170d20f440bfb1.fontdata"]
 
 [params]
 

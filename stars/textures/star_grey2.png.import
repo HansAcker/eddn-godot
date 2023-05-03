@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfrttsv1ckph4"
-path.s3tc="res://.godot/imported/fluff2.png-64e0bf87e5d1f02d725c57b75cf3c8ce.s3tc.ctex"
+uid="uid://cdip6fptt4q66"
+path.s3tc="res://.godot/imported/star_grey2.png-85da7a8952b8c36d5fa8d7e67dfdd4c1.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Stars/textures/fluff2.png"
-dest_files=["res://.godot/imported/fluff2.png-64e0bf87e5d1f02d725c57b75cf3c8ce.s3tc.ctex"]
+source_file="res://stars/textures/star_grey2.png"
+dest_files=["res://.godot/imported/star_grey2.png-85da7a8952b8c36d5fa8d7e67dfdd4c1.s3tc.ctex"]
 
 [params]
 

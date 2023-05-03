@@ -2,20 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://tu51wfur5kq7"
-path="res://.godot/imported/galaxy.jpg-a7c526d87088697d65823d8097d5e4c7.ctex"
+uid="uid://mnrjfu41axvo"
+path.s3tc="res://.godot/imported/flare_white.png-554c48a426d779964c26d0d88b4bd24b.s3tc.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc"],
+"vram_texture": true
 }
 
 [deps]
 
-source_file="res://Stars/textures/galaxy.jpg"
-dest_files=["res://.godot/imported/galaxy.jpg-a7c526d87088697d65823d8097d5e4c7.ctex"]
+source_file="res://stars/textures/flare_white.png"
+dest_files=["res://.godot/imported/flare_white.png-554c48a426d779964c26d0d88b4bd24b.s3tc.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1

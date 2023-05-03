@@ -66,5 +66,5 @@ const colors := {
 
 ## TODO: use multiple star classes
 const sprites := {
-	&"default": preload("res://Stars/StarClass_Generic.tscn"),
+	&"default": preload("res://stars/star_class_generic.tscn"),
 }

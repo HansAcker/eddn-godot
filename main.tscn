@@ -1,22 +1,22 @@
-[gd_scene load_steps=25 format=3 uid="uid://c4rjg7p7fmipt"]
+[gd_scene load_steps=25 format=3 uid="uid://caiaj482qonl2"]
 
-[ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
-[ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
-[ext_resource type="Texture2D" uid="uid://mnrjfu41axvo" path="res://Stars/textures/flare_white.png" id="2_btkb5"]
-[ext_resource type="Script" path="res://ws/EDDNReceiver.gd" id="2_g4fw5"]
-[ext_resource type="Texture2D" uid="uid://tu51wfur5kq7" path="res://Stars/textures/galaxy.jpg" id="3_fd031"]
-[ext_resource type="PackedScene" uid="uid://c7ssby8abrgs6" path="res://Stars/StarClass_Generic.tscn" id="5_b0o3s"]
-[ext_resource type="QuadMesh" uid="uid://d0la8tdf1e86c" path="res://Stars/FluffMesh.tres" id="5_ef24c"]
-[ext_resource type="Script" path="res://Stars/Fluff.gd" id="5_tnxg1"]
-[ext_resource type="Script" path="res://Stars/StarManager.gd" id="5_w6kjq"]
-[ext_resource type="Script" path="res://ws/JSONWebSocketReceiver.gd" id="6_127la"]
-[ext_resource type="Script" path="res://Stars/EDSMQuery.gd" id="8_esshd"]
-[ext_resource type="Script" path="res://UI/FPS.gd" id="8_l17iv"]
-[ext_resource type="Script" path="res://UI/UI_EDDNEvent.gd" id="8_x8crc"]
-[ext_resource type="Script" path="res://UI/StarCount.gd" id="8_xvtex"]
-[ext_resource type="Script" path="res://UI/CameraPosition.gd" id="10_jjyrp"]
-[ext_resource type="Script" path="res://ws/GenericEvent.gd" id="14_4qmla"]
-[ext_resource type="QuadMesh" uid="uid://bb3tcpvajerab" path="res://Stars/StarMesh.tres" id="18_88faq"]
+[ext_resource type="Script" path="res://main.gd" id="1_3yc8h"]
+[ext_resource type="Texture2D" uid="uid://mnrjfu41axvo" path="res://stars/textures/flare_white.png" id="2_btkb5"]
+[ext_resource type="Texture2D" uid="uid://tu51wfur5kq7" path="res://stars/textures/galaxy.jpg" id="3_fd031"]
+[ext_resource type="PackedScene" uid="uid://br5uwf6a8eyle" path="res://stars/star_class_generic.tscn" id="5_b0o3s"]
+[ext_resource type="QuadMesh" path="res://stars/fluff_mesh.tres" id="5_hvyhb"]
+[ext_resource type="Script" path="res://stars/fluff.gd" id="6_sa3n7"]
+[ext_resource type="Script" path="res://stars/star_manager.gd" id="7_wiqtr"]
+[ext_resource type="QuadMesh" path="res://stars/star_mesh.tres" id="8_bqfh2"]
+[ext_resource type="Script" path="res://stars/edsm_query.gd" id="9_46akg"]
+[ext_resource type="Script" path="res://ui/ui_eddn_event.gd" id="10_b786m"]
+[ext_resource type="Script" path="res://ui/fps.gd" id="11_klw85"]
+[ext_resource type="Script" path="res://ui/star_count.gd" id="12_jqahg"]
+[ext_resource type="Script" path="res://ui/camera_position.gd" id="13_rfmsg"]
+[ext_resource type="Script" path="res://ws/json_web_socket_receiver.gd" id="14_p83qc"]
+[ext_resource type="Script" path="res://ws/eddn_receiver.gd" id="15_b7ifv"]
+[ext_resource type="Script" path="res://ws/nav_route.gd" id="16_x3ei5"]
+[ext_resource type="Script" path="res://ws/generic_event.gd" id="17_wb623"]
 
 [sub_resource type="Environment" id="Environment_xftdg"]
 background_mode = 1
@@ -47,12 +47,12 @@ size = Vector2(104000, 104000)
 [sub_resource type="MultiMesh" id="MultiMesh_g54w7"]
 transform_format = 1
 use_colors = true
-mesh = ExtResource("5_ef24c")
+mesh = ExtResource("5_hvyhb")
 
 [sub_resource type="MultiMesh" id="MultiMesh_qnluk"]
 transform_format = 1
 use_colors = true
-mesh = ExtResource("18_88faq")
+mesh = ExtResource("8_bqfh2")
 
 [sub_resource type="SystemFont" id="SystemFont_m3hyb"]
 font_names = PackedStringArray("Lucida Console", "Monospace")
@@ -61,7 +61,8 @@ font_names = PackedStringArray("Lucida Console", "Monospace")
 default_font = SubResource("SystemFont_m3hyb")
 
 [node name="Main" type="Node3D"]
-script = ExtResource("1_wod4n")
+script = ExtResource("1_3yc8h")
+idle_move_seed = 24
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(-0.939693, -0.196175, 0.280167, 0, 0.819152, 0.573577, -0.34202, 0.538985, -0.769751, 4000, 4000, -4000)
@@ -83,10 +84,10 @@ texture = ExtResource("2_btkb5")
 
 [node name="Fluff" type="MultiMeshInstance3D" parent="Map/Galaxy"]
 multimesh = SubResource("MultiMesh_g54w7")
-script = ExtResource("5_tnxg1")
+script = ExtResource("6_sa3n7")
 
 [node name="StarManager" type="Node" parent="Map"]
-script = ExtResource("5_w6kjq")
+script = ExtResource("7_wiqtr")
 distance_factor = 1200.0
 
 [node name="FrozenStars" type="MultiMeshInstance3D" parent="Map/StarManager"]
@@ -94,7 +95,6 @@ multimesh = SubResource("MultiMesh_qnluk")
 
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
 wait_time = 35.0
-autostart = true
 
 [node name="DeleteTimer" type="Timer" parent="Map/StarManager"]
 wait_time = 80.0
@@ -105,10 +105,10 @@ wait_time = 340.0
 autostart = true
 
 [node name="EDSMQuery" type="Node" parent="Map"]
-script = ExtResource("8_esshd")
+script = ExtResource("9_46akg")
 radius = 30
 min_radius = 24
-expire = 65
+expire = 1
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -116,7 +116,7 @@ expire = 65
 offset_right = 1.0
 offset_bottom = 54.0
 theme = SubResource("Theme_y7a2b")
-script = ExtResource("8_x8crc")
+script = ExtResource("10_b786m")
 
 [node name="Timestamp" type="Label" parent="UI/UI_EDDNEvent"]
 layout_mode = 2
@@ -140,7 +140,7 @@ offset_left = -1.0
 offset_top = -23.0
 grow_horizontal = 0
 grow_vertical = 0
-script = ExtResource("8_l17iv")
+script = ExtResource("11_klw85")
 
 [node name="StarCount" type="Label" parent="UI"]
 anchors_preset = 2
@@ -149,7 +149,7 @@ anchor_bottom = 1.0
 offset_top = -23.0
 offset_right = 40.0
 grow_vertical = 0
-script = ExtResource("8_xvtex")
+script = ExtResource("12_jqahg")
 
 [node name="CameraPosition" type="Label" parent="UI"]
 anchors_preset = 1
@@ -158,30 +158,30 @@ anchor_right = 1.0
 offset_left = -40.0
 offset_bottom = 23.0
 grow_horizontal = 0
-script = ExtResource("10_jjyrp")
+script = ExtResource("13_rfmsg")
 
 [node name="Receiver" type="Node" parent="."]
 
 [node name="JSONWebSocketReceiver" type="Node" parent="Receiver"]
-script = ExtResource("6_127la")
+script = ExtResource("14_p83qc")
 
 [node name="EDDNReceiver" type="Node" parent="Receiver"]
-script = ExtResource("2_g4fw5")
+script = ExtResource("15_b7ifv")
+cut_off = 60
 clock_fudge = 2
 
 [node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
-script = ExtResource("2_3lfp6")
+script = ExtResource("16_x3ei5")
 expire = 300
 
 [node name="GenericEvent" type="Node" parent="Receiver/EDDNReceiver"]
-script = ExtResource("14_4qmla")
+script = ExtResource("17_wb623")
 expire = 3600
 
 [node name="IdleTimer" type="Timer" parent="."]
 wait_time = 55.0
 autostart = true
 
-[connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
 [connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
 [connection signal="timeout" from="Map/StarManager/DeleteTimer" to="Map/StarManager" method="_on_delete_timer_timeout"]
 [connection signal="timeout" from="Map/StarManager/FreezeTimer" to="Map/StarManager" method="_on_freeze_timer_timeout"]

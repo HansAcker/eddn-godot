@@ -9,7 +9,7 @@ extends MultiMeshInstance3D
 
 func _ready():
 	## TODO: get texture from parent?
-	var image: Image = (load("res://Stars/textures/galaxy.jpg") as Texture2D).get_image()
+	var image: Image = (load("res://stars/textures/galaxy.jpg") as Texture2D).get_image()
 	var size := image.get_size()
 
 	## TODO: get galaxy size from parent?

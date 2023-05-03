@@ -1,6 +1,6 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cbaipb5v8jxwh"]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
 
-[ext_resource type="Texture2D" uid="uid://dfrttsv1ckph4" path="res://Stars/textures/fluff2.png" id="1_drenq"]
+[ext_resource type="Texture2D" uid="uid://dfrttsv1ckph4" path="res://stars/textures/fluff2.png" id="1_drenq"]
 
 [resource]
 blend_mode = 1
