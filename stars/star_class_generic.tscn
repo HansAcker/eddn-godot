@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://xqotvd7qfgow"]
 
 [ext_resource type="Texture2D" uid="uid://oh2d8hnygfen" path="res://stars/textures/star_grey.png" id="1_6vmr1"]
-[ext_resource type="FontFile" uid="uid://cy1v2mvb86jhx" path="res://stars/fonts/orbitron/orbitron_light.ttf" id="2_5uagk"]
+[ext_resource type="FontFile" uid="uid://cy1v2mvb86jhx" path="res://stars/fonts/orbitron/orbitron_light.ttf" id="2_gjbyy"]
 
 [node name="StarClass_Generic" type="Sprite3D"]
 visibility_range_begin = 20.0
@@ -22,7 +22,7 @@ visibility_range_fade_mode = 1
 offset = Vector2(0, -250)
 billboard = 1
 modulate = Color(0.4, 0.352941, 0.74902, 1)
-font = ExtResource("2_5uagk")
+font = ExtResource("2_gjbyy")
 font_size = 112
 outline_size = 0
 vertical_alignment = 0

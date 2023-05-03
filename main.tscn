@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://main.gd" id="1_3yc8h"]
 [ext_resource type="Texture2D" uid="uid://mnrjfu41axvo" path="res://stars/textures/flare_white.png" id="2_btkb5"]
 [ext_resource type="Texture2D" uid="uid://tu51wfur5kq7" path="res://stars/textures/galaxy.jpg" id="3_fd031"]
-[ext_resource type="PackedScene" uid="uid://br5uwf6a8eyle" path="res://stars/star_class_generic.tscn" id="5_b0o3s"]
+[ext_resource type="PackedScene" uid="uid://xqotvd7qfgow" path="res://stars/star_class_generic.tscn" id="5_b0o3s"]
 [ext_resource type="QuadMesh" path="res://stars/fluff_mesh.tres" id="5_hvyhb"]
 [ext_resource type="Script" path="res://stars/fluff.gd" id="6_sa3n7"]
 [ext_resource type="Script" path="res://stars/star_manager.gd" id="7_wiqtr"]
