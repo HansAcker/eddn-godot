@@ -4,4 +4,4 @@
 
 [resource]
 material = ExtResource("1_ntp35")
-size = Vector2(15, 15)
+size = Vector2(20, 20)

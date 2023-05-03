@@ -1,16 +1,15 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cbaipb5v8jxwh"]
 
-[ext_resource type="Texture2D" uid="uid://dkj6oiixujuej" path="res://Stars/textures/fluff1.png" id="1_8fnd1"]
+[ext_resource type="Texture2D" uid="uid://dfrttsv1ckph4" path="res://Stars/textures/fluff2.png" id="1_drenq"]
 
 [resource]
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_texture = ExtResource("1_8fnd1")
+albedo_texture = ExtResource("1_drenq")
 texture_filter = 1
-texture_repeat = false
 disable_receive_shadows = true
 billboard_mode = 1
 distance_fade_mode = 2
-distance_fade_min_distance = 400.0
-distance_fade_max_distance = 1000.0
+distance_fade_min_distance = 600.0
+distance_fade_max_distance = 2000.0
