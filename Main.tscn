@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://c4rjg7p7fmipt"]
+[gd_scene load_steps=25 format=3 uid="uid://c4rjg7p7fmipt"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_wod4n"]
 [ext_resource type="Script" path="res://ws/NavRoute.gd" id="2_3lfp6"]
@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://UI/StarCount.gd" id="8_xvtex"]
 [ext_resource type="Script" path="res://UI/CameraPosition.gd" id="10_jjyrp"]
 [ext_resource type="Script" path="res://ws/GenericEvent.gd" id="14_4qmla"]
+[ext_resource type="QuadMesh" uid="uid://bb3tcpvajerab" path="res://Stars/StarMesh.tres" id="18_88faq"]
 
 [sub_resource type="Environment" id="Environment_xftdg"]
 background_mode = 1
@@ -48,6 +49,11 @@ transform_format = 1
 use_colors = true
 mesh = ExtResource("5_ef24c")
 
+[sub_resource type="MultiMesh" id="MultiMesh_qnluk"]
+transform_format = 1
+use_colors = true
+mesh = ExtResource("18_88faq")
+
 [sub_resource type="SystemFont" id="SystemFont_m3hyb"]
 font_names = PackedStringArray("Lucida Console", "Monospace")
 
@@ -56,7 +62,6 @@ default_font = SubResource("SystemFont_m3hyb")
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_wod4n")
-idle_move = true
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(-0.939693, -0.196175, 0.280167, 0, 0.819152, 0.573577, -0.34202, 0.538985, -0.769751, 4000, 4000, -4000)
@@ -80,29 +85,30 @@ texture = ExtResource("2_btkb5")
 multimesh = SubResource("MultiMesh_g54w7")
 script = ExtResource("5_tnxg1")
 
-[node name="Sol" parent="Map" instance=ExtResource("5_b0o3s")]
-visible = false
-modulate = Color(1, 0.827451, 0.541176, 1)
-
 [node name="StarManager" type="Node" parent="Map"]
 script = ExtResource("5_w6kjq")
 distance_factor = 1200.0
 
+[node name="FrozenStars" type="MultiMeshInstance3D" parent="Map/StarManager"]
+multimesh = SubResource("MultiMesh_qnluk")
+
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
-process_callback = 0
-wait_time = 12.0
+wait_time = 35.0
 autostart = true
 
 [node name="DeleteTimer" type="Timer" parent="Map/StarManager"]
-process_callback = 0
-wait_time = 2.0
+wait_time = 80.0
+autostart = true
+
+[node name="FreezeTimer" type="Timer" parent="Map/StarManager"]
+wait_time = 340.0
 autostart = true
 
 [node name="EDSMQuery" type="Node" parent="Map"]
 script = ExtResource("8_esshd")
 radius = 30
 min_radius = 24
-expire = 23
+expire = 65
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -165,19 +171,20 @@ clock_fudge = 2
 
 [node name="NavRoute" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("2_3lfp6")
-expire = 1800
+expire = 300
 
 [node name="GenericEvent" type="Node" parent="Receiver/EDDNReceiver"]
 script = ExtResource("14_4qmla")
-expire = 14400
+expire = 3600
 
 [node name="IdleTimer" type="Timer" parent="."]
-wait_time = 23.0
+wait_time = 55.0
 autostart = true
 
 [connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
 [connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
 [connection signal="timeout" from="Map/StarManager/DeleteTimer" to="Map/StarManager" method="_on_delete_timer_timeout"]
+[connection signal="timeout" from="Map/StarManager/FreezeTimer" to="Map/StarManager" method="_on_freeze_timer_timeout"]
 [connection signal="disconnected" from="Receiver/JSONWebSocketReceiver" to="UI/UI_EDDNEvent" method="_on_json_web_socket_receiver_disconnected"]
 [connection signal="received" from="Receiver/JSONWebSocketReceiver" to="Receiver/EDDNReceiver" method="_on_json_web_socket_receiver_received"]
 [connection signal="received" from="Receiver/EDDNReceiver" to="UI/UI_EDDNEvent" method="_on_eddn_receiver_received"]
