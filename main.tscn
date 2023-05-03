@@ -109,7 +109,7 @@ autostart = true
 script = ExtResource("9_46akg")
 radius = 30
 min_radius = 24
-expire = 1
+expire = 65
 
 [node name="UI" type="CanvasLayer" parent="."]
 
