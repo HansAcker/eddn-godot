@@ -9,14 +9,14 @@ extends MultiMeshInstance3D
 
 func _ready():
 	## TODO: get texture from parent?
-	var image: Image = load("res://Stars/textures/galaxy.jpg").get_image()
+	var image: Image = (load("res://Stars/textures/galaxy.jpg") as Texture2D).get_image()
 	var size := image.get_size()
 
 	## TODO: get galaxy size from parent?
 	var xscale := 104000 / size.x
 	var zscale := 104000 / size.y
 
-	var instances: Array = []
+	var instances := []
 
 	## Max. instances per pixel
 	var ipp := int((104000**2) / (size.x * size.y) / 10000)
