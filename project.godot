@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 
 [debug]
 
-gdscript/warnings/return_value_discarded=1
 gdscript/warnings/unsafe_property_access=1
 gdscript/warnings/unsafe_method_access=1
 gdscript/warnings/unsafe_cast=1
