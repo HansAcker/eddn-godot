@@ -16,7 +16,7 @@ func _on_eddn_receiver_received(event_type: StringName, message: Dictionary, sta
 	type_label.text = event_type
 	system_label.text = star_system.name
 	position_label.text = "x: %10.3fly y: %10.3fly z: %10.3fly" % [-star_system.position.x, star_system.position.y, star_system.position.z] if star_system.position != StarSystemRecord.POS_INVALID else ""
-	ts_label.text = "%s (%ss ago), %.1f jpm" % [message.timestamp, age, (jumps as float) / (Time.get_ticks_msec() as float) * 1000.0 * 60.0]
+	ts_label.text = "%s (%ss ago), %.1f jumps per minute" % [message.timestamp, age, (jumps as float) / (Time.get_ticks_msec() as float) * 1000.0 * 60.0]
 
 
 func _on_json_web_socket_receiver_disconnected(code: int, reason: String) -> void:
