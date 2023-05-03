@@ -95,6 +95,7 @@ multimesh = SubResource("MultiMesh_qnluk")
 
 [node name="ExpireTimer" type="Timer" parent="Map/StarManager"]
 wait_time = 35.0
+autostart = true
 
 [node name="DeleteTimer" type="Timer" parent="Map/StarManager"]
 wait_time = 80.0
