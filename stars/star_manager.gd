@@ -28,6 +28,9 @@ signal counter(count: int, meshed: int)
 ## Time to normal size in seconds.
 @export var flare_down: float = 0.2
 
+## File storing saved multimesh-stars.
+@export_file var mesh_file: String = "res://stars/fixed_stars.dat"
+
 
 class _StarEntry:
 	var system: StarSystemRecord  ## system name, class and location
@@ -58,11 +61,15 @@ var _mesh_stars := {}
 
 ## Existing MultiMesh instance to modify. Should be empty, unless _mesh_stars is also filled
 ## TODO: save/reload mesh, colors and IDs
-@onready var _star_mesh := ($FrozenStars as MultiMeshInstance3D).multimesh
+@onready var _star_mesh: MultiMesh = ($FrozenStars as MultiMeshInstance3D).multimesh
 
 @onready var _delete_timer := $DeleteTimer as Timer
 
 #@onready var Log := get_node("../../UI/Log")
+
+
+func _ready() -> void:
+	_load_mesh()
 
 
 func add(star_system: StarSystemRecord, expire_msec: int = 0, alpha: float = 1.0, highlight: bool = true, persist: bool = true) -> void:
@@ -230,6 +237,48 @@ func clear() -> void:
 	counter.emit(len(_stars), len(_mesh_stars))
 
 
+func expire() -> void:
+	_expire()
+
+
+func _load_mesh() -> void:
+	var file := FileAccess.open_compressed(mesh_file, FileAccess.READ)
+	if !file:
+		return
+
+	var _contents = file.get_var()
+	file.close()
+
+	if !(_contents is Dictionary):
+		push_error("Unexpected data in mesh file")
+		return
+
+	var saved_stars := _contents as Dictionary
+
+	var _saved_ids = saved_stars.get("ids")
+	var _saved_mesh = saved_stars.get("mesh")
+
+	if !(_saved_ids is Dictionary && _saved_mesh is PackedFloat32Array):
+		push_error("Unexpected data in mesh file")
+		return
+
+	_mesh_stars = _saved_ids
+
+	_star_mesh.instance_count = len(_mesh_stars)
+	_star_mesh.buffer = _saved_mesh
+
+	print("Loaded %d stars from mesh file" % len(_mesh_stars))
+
+
+func _save_mesh() -> void:
+	var file = FileAccess.open_compressed(mesh_file, FileAccess.WRITE, FileAccess.COMPRESSION_ZSTD)
+	if !file:
+		push_error("Error writing mesh file")
+		return
+	file.store_var({"ids": _mesh_stars, "mesh": _star_mesh.buffer})
+	file.close()
+
+
 #func expire() -> int:
 #	var now := Time.get_ticks_msec()
 #	var count: int = 0
@@ -312,10 +361,6 @@ func _expire(freeze: bool = false) -> void:
 
 
 func _on_expire_timer_timeout() -> void:
-	_expire()
-
-
-func expire() -> void:
 	_expire()
 
 
