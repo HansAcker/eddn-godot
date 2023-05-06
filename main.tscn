@@ -62,7 +62,6 @@ default_font = SubResource("SystemFont_m3hyb")
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_3yc8h")
-idle_move_seed = 24
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(-0.939693, -0.196175, 0.280167, 0, 0.819152, 0.573577, -0.34202, 0.538985, -0.769751, 4000, 4000, -4000)
