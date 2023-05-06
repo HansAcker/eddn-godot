@@ -5,8 +5,8 @@ class_name StarSystemRecord
 ## Static functions to parse data from EDDN message
 
 
-## TODO: is is_equal_approx() required to compare positions to POS_INVALID?
 const POS_INVALID := Vector3(0.0, 100e3, 0.0) ## arbitrary dummy location. TODO: use something else?
+
 
 var name: String
 var id: int  ## ED id64 field. unsigned int64. 55 bits used for systems, should fit into Godot's signed int64. see http://disc.thargoid.space/ID64
