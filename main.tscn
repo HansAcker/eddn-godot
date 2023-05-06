@@ -183,6 +183,7 @@ expire = 3600
 wait_time = 55.0
 autostart = true
 
+[connection signal="counter" from="Map/StarManager" to="UI/StarCount" method="_on_star_manager_counter"]
 [connection signal="timeout" from="Map/StarManager/ExpireTimer" to="Map/StarManager" method="_on_expire_timer_timeout"]
 [connection signal="timeout" from="Map/StarManager/DeleteTimer" to="Map/StarManager" method="_on_delete_timer_timeout"]
 [connection signal="timeout" from="Map/StarManager/FreezeTimer" to="Map/StarManager" method="_on_freeze_timer_timeout"]
