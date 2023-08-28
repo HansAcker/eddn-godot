@@ -54,7 +54,7 @@ var _expire_ticks := {}
 
 ## Array of objects to be freed
 var _delete_queue: Array = []
-var _delete_thread := Thread.new()
+#var _delete_thread := Thread.new()
 
 ## IDs of systems already added to the mesh. This could become large.
 var _mesh_stars := {}
@@ -366,6 +366,7 @@ func _on_expire_timer_timeout() -> void:
 
 func _on_freeze_timer_timeout() -> void:
 	_expire(true)
+#	_save_mesh()
 
 
 func _delete_queue_run(queue: Array) -> void:
@@ -381,12 +382,12 @@ func _delete_queue_run(queue: Array) -> void:
 
 
 func _on_delete_timer_timeout() -> void:
-	if _delete_thread.is_started():
-		if _delete_thread.is_alive():
-			push_warning("StarManager delete thread still alive")
-			return
-
-		_delete_thread.wait_to_finish()
+#	if _delete_thread.is_started():
+#		if _delete_thread.is_alive():
+#			push_warning("StarManager delete thread still alive")
+#			return
+#
+#		_delete_thread.wait_to_finish()
 
 	if !len(_delete_queue):
 		return
