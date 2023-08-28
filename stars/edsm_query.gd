@@ -43,10 +43,12 @@ func _ready() -> void:
 
 func add_stars_at(position: Vector3) -> void:
 	var center := Vector3(snappedf(-position.x, location_precision), snappedf(position.y, location_precision), snappedf(position.z, location_precision))
-	print("EDSM query center: %s" % center)
+	print("EDSM query center: %s" % center)  ## TODO: string conversion does not display all digits
+
+	http_request.cancel_request()
 
 	var error := http_request.request(edsm_api_base + "/api-v1/sphere-systems?x=%s&y=%s&z=%s&radius=%d&minRadius=%d&showId=1&showCoordinates=1&showPrimaryStar=1" %
-			["%.5f" % center.x, "%.5f" % center.y, "%.5f" % center.z, radius, min_radius])
+			["%.0f" % center.x, "%.0f" % center.y, "%.0f" % center.z, radius, min_radius])  ## TODO: make %f precision configurable or from location_precision
 	if error != OK:
 		push_error("EDSM query error in the HTTP request.")
 
