@@ -99,17 +99,17 @@ func _http_request_completed(result: int, response_code: int, headers: PackedStr
 		var coords := _coords as Dictionary
 
 		var x = coords.get("x")
-		if !(x is float):
+		if !(x is float || x is int):
 			push_error("EDSM response: invalid coords in %s" % sys)
 			continue
 
 		var y = coords.get("y")
-		if !(y is float):
+		if !(y is float || y is int):
 			push_error("EDSM response: invalid coords in %s" % sys)
 			continue
 
 		var z = coords.get("z")
-		if !(z is float):
+		if !(z is float || z is int):
 			push_error("EDSM response: invalid coords in %s" % sys)
 			continue
 

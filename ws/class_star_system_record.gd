@@ -52,7 +52,9 @@ static func parse_star_class(from: Dictionary) -> StringName:
 static func parse_starpos(from: Dictionary) -> Vector3:
 	var starpos = from.get("StarPos")
 	if !(starpos is Array && len(starpos) == 3 &&
-			(starpos[0] is float) && (starpos[1] is float) && (starpos[2] is float)):
+			(starpos[0] is float || starpos[0] is int) &&
+			(starpos[1] is float || starpos[1] is int) &&
+			(starpos[2] is float || starpos[2] is int)):
 		return POS_INVALID
 	return Vector3(-starpos[0], starpos[1], starpos[2])  ## +x in ED is -x in this world
 
