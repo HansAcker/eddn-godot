@@ -8,6 +8,9 @@ extends Node
 ## TODO: map EDSM star classes (Neutron -> N, etc.)
 
 
+signal completed()
+
+
 ## EDSM API base URL. E.g. https://www.edsm.net
 #@export var edsm_api_base : String = "https://www.edsm.net"
 @export var edsm_api_base : String = "https://test.eddn-realtime.space/.edsmcache"
@@ -57,6 +60,8 @@ func _http_request_completed(result: int, response_code: int, headers: PackedStr
 	## TODO: maybe extract X-Rate-Limit-Limit, -Remaining, -Reset
 #	print("EDSM response: result %d, rc %d" % [result, response_code])
 #	print(headers)
+
+	completed.emit()
 
 	var json := JSON.new()
 	var rc := json.parse(body.get_string_from_utf8())
