@@ -9,7 +9,7 @@ extends MultiMeshInstance3D
 
 func _ready():
 	## TODO: get texture from parent?
-	var image: Image = (load("res://stars/textures/galaxy.jpg") as Texture2D).get_image()
+	var image: Image = (preload("res://stars/textures/galaxy.jpg") as Texture2D).get_image()
 	var size := image.get_size()
 
 	## TODO: get galaxy size from parent?
@@ -28,11 +28,11 @@ func _ready():
 	## TODO: use image.get_data() and process the array instead of image.get_pixel?
 
 	for x in range(-size.x/2, size.x/2):
-		var pixel_x = x + (size.x/2)
+		var pixel_x := x + (size.x/2)
 		edge_xy.x = 1 - inverse_lerp(0.0, size.x/2, abs(x))
 
 		for y in range(-size.y/2, size.y/2):
-			var pixel_y = y + (size.y/2)
+			var pixel_y := y + (size.y/2)
 			edge_xy.y = 1 - inverse_lerp(0.0, size.y/2, abs(y))
 
 			var pixel := image.get_pixel(pixel_x, pixel_y).srgb_to_linear()*10  ## TODO: explain scale, make configurable

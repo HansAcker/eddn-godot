@@ -310,8 +310,8 @@ func _expire(freeze: bool = false) -> void:
 		var before := _star_mesh.instance_count
 		var after := before
 
-		var vertices := []
-		var colors := []
+		var vertices : Array[Vector3] = []
+		var colors : Array[Color] = []
 
 		for id in _expire_ticks.keys():
 			var expire_tick := _expire_ticks[id] as int
